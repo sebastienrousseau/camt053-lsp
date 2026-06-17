@@ -1,10 +1,11 @@
 # camt053-lsp: A Language Server for Authoring ISO 20022 Reversing-Entry Files
 
-![camt053-lsp banner][banner]
+<p align="center">
+  <img src="https://cloudcdn.pro/camt053/v1/logos/camt053.svg" alt="camt053-lsp logo" width="128" />
+</p>
 
 [![PyPI Version][pypi-badge]][07]
 [![Python Versions][python-versions-badge]][07]
-[![PyPI Downloads][pypi-downloads-badge]][07]
 [![License][license-badge]][01]
 [![Tests][tests-badge]][tests-url]
 [![Quality][quality-badge]][quality-url]
@@ -286,12 +287,10 @@ Built on [pygls][pygls] and [lsprotocol][lsprotocol] by the
 [lsprotocol]: https://github.com/microsoft/lsprotocol
 [pygls]: https://github.com/openlawlibrary/pygls
 [release-001]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.1
-[banner]: https://cloudcdn.pro/api/transform?url=/camt053/v1/logos/camt053.webp&w=128 'camt053-lsp'
 [docs-badge]: https://img.shields.io/badge/Docs-camt053.com-blue?style=for-the-badge
 [docs-url]: https://camt053.com/
 [license-badge]: https://img.shields.io/pypi/l/camt053-lsp?style=for-the-badge
 [pypi-badge]: https://img.shields.io/pypi/v/camt053-lsp?style=for-the-badge
-[pypi-downloads-badge]: https://img.shields.io/pypi/dm/camt053-lsp.svg?style=for-the-badge
 [python-versions-badge]: https://img.shields.io/pypi/pyversions/camt053-lsp.svg?style=for-the-badge
 [quality-badge]: https://img.shields.io/github/actions/workflow/status/sebastienrousseau/camt053-lsp/ci.yml?branch=main&label=Quality&style=for-the-badge
 [quality-url]: https://github.com/sebastienrousseau/camt053-lsp/actions/workflows/ci.yml
