@@ -57,8 +57,23 @@ python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
 addopts = [
+    "--cov=camt053_lsp",
+    "--cov-branch",
+    "--cov-report=term-missing",
+    "--cov-fail-under=100",
     "-ra",
     "--strict-markers",
+]
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+exclude_also = [
+    "pragma: no cover",
+    "if sys.platform",
+    "except Exception:",
+    "except \\(RuntimeError, OSError\\)",
 ]
 
 [tool.mypy]

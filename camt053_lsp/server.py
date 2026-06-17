@@ -174,6 +174,7 @@ def compute_diagnostics(
     line_offsets = _record_line_offsets(text)
 
     def line_for(row: int) -> int:
+        """Return the source line for a record index, or 0 if unknown."""
         if 0 <= row < len(line_offsets):
             return line_offsets[row]
         return 0
@@ -210,8 +211,7 @@ def compute_diagnostics(
                         "character": 0,
                         "severity": "warning",
                         "message": (
-                            f"{field}: {value!r} is not a valid "
-                            f"{kind.upper()}."
+                            f"{field}: {value!r} is not a valid " f"{kind.upper()}."
                         ),
                     }
                 )
@@ -254,9 +254,7 @@ def completion_items(
     return items
 
 
-def hover_text(
-    field: str, message_type: str = DEFAULT_MESSAGE_TYPE
-) -> str | None:
+def hover_text(field: str, message_type: str = DEFAULT_MESSAGE_TYPE) -> str | None:
     """Return the schema description for ``field``, or ``None``.
 
     Args:
@@ -299,9 +297,7 @@ def _to_lsp_diagnostics(raw: list[dict]) -> list[lsp.Diagnostic]:
                     end=lsp.Position(line=line, character=char),
                 ),
                 message=item["message"],
-                severity=_SEVERITY.get(
-                    item["severity"], lsp.DiagnosticSeverity.Error
-                ),
+                severity=_SEVERITY.get(item["severity"], lsp.DiagnosticSeverity.Error),
                 source="camt053-lsp",
             )
         )
@@ -321,25 +317,19 @@ def _validate_and_publish(ls: LanguageServer, uri: str) -> None:
 
 
 @server.feature(lsp.TEXT_DOCUMENT_DID_OPEN)
-def did_open(
-    ls: LanguageServer, params: lsp.DidOpenTextDocumentParams
-) -> None:
+def did_open(ls: LanguageServer, params: lsp.DidOpenTextDocumentParams) -> None:
     """Publish diagnostics when a document is opened."""
     _validate_and_publish(ls, params.text_document.uri)
 
 
 @server.feature(lsp.TEXT_DOCUMENT_DID_CHANGE)
-def did_change(
-    ls: LanguageServer, params: lsp.DidChangeTextDocumentParams
-) -> None:
+def did_change(ls: LanguageServer, params: lsp.DidChangeTextDocumentParams) -> None:
     """Publish diagnostics when a document changes."""
     _validate_and_publish(ls, params.text_document.uri)
 
 
 @server.feature(lsp.TEXT_DOCUMENT_COMPLETION)
-def completion(
-    ls: LanguageServer, params: lsp.CompletionParams
-) -> lsp.CompletionList:
+def completion(ls: LanguageServer, params: lsp.CompletionParams) -> lsp.CompletionList:
     """Offer input-field and message-type completions."""
     items = [
         lsp.CompletionItem(
@@ -370,5 +360,5 @@ def main() -> None:
     server.start_io()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()

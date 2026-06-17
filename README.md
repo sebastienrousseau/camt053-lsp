@@ -1,11 +1,11 @@
-# Camt053-lsp: A Language Server for Authoring ISO 20022 Reversing-Entry Files
+# camt053-lsp: A Language Server for Authoring ISO 20022 Reversing-Entry Files
 
-![Camt053-lsp banner][banner]
+![camt053-lsp banner][banner]
 
 [![PyPI Version][pypi-badge]][07]
 [![Python Versions][python-versions-badge]][07]
 [![PyPI Downloads][pypi-downloads-badge]][07]
-[![Licence][licence-badge]][01]
+[![License][license-badge]][01]
 [![Tests][tests-badge]][tests-url]
 [![Quality][quality-badge]][quality-url]
 [![Documentation][docs-badge]][docs-url]
@@ -29,8 +29,8 @@ reversal generation.
 - [Using the helpers](#using-the-helpers)
 - [Examples](#examples)
 - [Development](#development)
-- [Licence](#licence)
-- [Contribution](#contribution)
+- [License](#license)
+- [Contributing](#contributing)
 - [Acknowledgements](#acknowledgements)
 
 ## Overview
@@ -38,7 +38,7 @@ reversal generation.
 A **Language Server** speaks the
 [Language Server Protocol (LSP)][lsp] — the editor-agnostic protocol that lets a
 single backend deliver diagnostics, completion, hover, and more to any LSP
-client (VS Code, Neovim, Helix, Emacs, …). **Camt053-lsp** is that backend for
+client (VS Code, Neovim, Helix, Emacs, …). **camt053-lsp** is that backend for
 **reversing-entry data JSON files**: the JSON arrays of flat reversing-entry
 records that drive ISO 20022 `camt.053` reversal generation in the
 [`camt053`][camt053] suite.
@@ -62,7 +62,7 @@ The intended message type defaults to `camt.053.001.14` (Bank to Customer
 Statement); the pure helpers accept a `message_type` argument so a different
 type can be configured.
 
-**Camt053-lsp** is part of the **camt053 suite** — a set of independently
+**camt053-lsp** is part of the **camt053 suite** — a set of independently
 installable packages (all Python 3.10+) sharing the `camt053.services` layer:
 
 | Package | Role |
@@ -81,7 +81,7 @@ flowchart LR
 
 ## Install
 
-**Camt053-lsp** runs on macOS, Linux, and Windows and requires **Python 3.10+**
+**camt053-lsp** runs on macOS, Linux, and Windows and requires **Python 3.10+**
 and **pip**. It pulls in the core [`camt053`][camt053] library and
 [`pygls`][pygls] automatically.
 
@@ -241,7 +241,7 @@ python examples/lsp_helpers.py
 
 ## Development
 
-**Camt053-lsp** uses [Poetry](https://python-poetry.org/) and
+**camt053-lsp** uses [Poetry](https://python-poetry.org/) and
 [mise](https://mise.jdx.dev/).
 
 ```bash
@@ -261,12 +261,12 @@ make type-check   # mypy --strict
 make examples     # run the example script
 ```
 
-## Licence
+## License
 
-Licensed under the [Apache Licence, Version 2.0][01]. Any contribution submitted
+Licensed under the [Apache License, Version 2.0][01]. Any contribution submitted
 for inclusion shall be licensed as above, without additional terms.
 
-## Contribution
+## Contributing
 
 Contributions are welcome — see the [contributing instructions][04]. Thanks to
 all [contributors][05].
@@ -286,10 +286,10 @@ Built on [pygls][pygls] and [lsprotocol][lsprotocol] by the
 [lsprotocol]: https://github.com/microsoft/lsprotocol
 [pygls]: https://github.com/openlawlibrary/pygls
 [release-001]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.1
-[banner]: https://kura.pro/camt053-lsp/images/banners/banner-camt053-lsp.svg 'Camt053-lsp'
+[banner]: https://kura.pro/camt053-lsp/images/banners/banner-camt053-lsp.svg 'camt053-lsp'
 [docs-badge]: https://img.shields.io/badge/Docs-camt053.com-blue?style=for-the-badge
 [docs-url]: https://camt053.com/
-[licence-badge]: https://img.shields.io/pypi/l/camt053-lsp?style=for-the-badge
+[license-badge]: https://img.shields.io/pypi/l/camt053-lsp?style=for-the-badge
 [pypi-badge]: https://img.shields.io/pypi/v/camt053-lsp?style=for-the-badge
 [pypi-downloads-badge]: https://img.shields.io/pypi/dm/camt053-lsp.svg?style=for-the-badge
 [python-versions-badge]: https://img.shields.io/pypi/pyversions/camt053-lsp.svg?style=for-the-badge
