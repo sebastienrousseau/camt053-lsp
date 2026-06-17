@@ -286,7 +286,7 @@ Built on [pygls][pygls] and [lsprotocol][lsprotocol] by the
 [lsprotocol]: https://github.com/microsoft/lsprotocol
 [pygls]: https://github.com/openlawlibrary/pygls
 [release-001]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.1
-[banner]: https://kura.pro/camt053-lsp/images/banners/banner-camt053-lsp.svg 'camt053-lsp'
+[banner]: https://cloudcdn.pro/camt53/v1/logos/camt53.svg 'camt053-lsp'
 [docs-badge]: https://img.shields.io/badge/Docs-camt053.com-blue?style=for-the-badge
 [docs-url]: https://camt053.com/
 [license-badge]: https://img.shields.io/pypi/l/camt053-lsp?style=for-the-badge
