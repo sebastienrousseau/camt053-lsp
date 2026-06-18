@@ -419,3 +419,331 @@ def test_validate_and_publish_directly(reversal_record):
     ls = _FakeLanguageServer(document)
     lsp_server._validate_and_publish(ls, "file:///doc.json")
     assert len(ls.published) == 1
+
+
+# ---------------------------------------------------------------------------
+# (C) JSONC tolerance.
+# ---------------------------------------------------------------------------
+def test_strip_jsonc_removes_line_comments_and_trailing_commas():
+    """``//`` comments and trailing commas are stripped; strings preserved."""
+    text = (
+        "[\n"
+        "  // leading comment\n"
+        '  {"a": 1, "b": "http://x", "c": 2,},\n'
+        '  {"d": "trailing, comma in string",},\n'
+        "]"
+    )
+    stripped = lsp_server._strip_jsonc(text)
+    parsed = json.loads(stripped)
+    assert parsed == [
+        {"a": 1, "b": "http://x", "c": 2},
+        {"d": "trailing, comma in string"},
+    ]
+
+
+def test_strip_jsonc_preserves_escaped_quote_in_string():
+    """An escaped quote inside a string must not end the string early."""
+    text = '{"a": "he said \\"//hi\\"", "b": 2,}'
+    parsed = json.loads(lsp_server._strip_jsonc(text))
+    assert parsed == {"a": 'he said "//hi"', "b": 2}
+
+
+def test_loads_tolerant_parses_clean_json_identically():
+    """Clean JSON parses exactly as ``json.loads`` would."""
+    assert lsp_server._loads_tolerant('[{"a": 1}]') == [{"a": 1}]
+
+
+def test_diagnostics_tolerate_jsonc(reversal_record):
+    """Diagnostics work on a JSONC document (comments + trailing commas)."""
+    record = dict(reversal_record)
+    body = json.dumps(record)
+    text = "[\n  // a comment\n  " + body + ",\n]"
+    assert lsp_server.compute_diagnostics(text) == []
+
+
+# ---------------------------------------------------------------------------
+# (D) Document symbols (outline).
+# ---------------------------------------------------------------------------
+def test_document_symbols_records_fields_and_lines(reversal_record):
+    """Each record yields a parent symbol with its fields as children."""
+    text = "[\n" + json.dumps(dict(reversal_record)) + "\n]"
+    symbols = lsp_server.document_symbols(text)
+    assert len(symbols) == 1
+    record = symbols[0]
+    assert record["name"] == "Record 1"
+    assert record["kind"] == "record"
+    assert record["detail"] == reversal_record["statement_msg_id"]
+    assert record["line"] == 1
+    names = {child["name"] for child in record["children"]}
+    assert "reason_code" in names
+    assert all(child["kind"] == "field" for child in record["children"])
+    assert all(child["line"] == 1 for child in record["children"])
+
+
+def test_document_symbols_entry_ref_fallback_detail():
+    """When ``statement_msg_id`` is absent, ``entry_ref`` is used as detail."""
+    text = json.dumps([{"entry_ref": "NTRY-9"}])
+    symbols = lsp_server.document_symbols(text)
+    assert symbols[0]["detail"] == "NTRY-9"
+
+
+def test_document_symbols_no_id_empty_detail():
+    """A record with neither id field gets an empty detail string."""
+    text = json.dumps([{"other": 1}])
+    symbols = lsp_server.document_symbols(text)
+    assert symbols[0]["detail"] == ""
+
+
+def test_document_symbols_non_dict_record_no_children():
+    """A non-dict record yields a parent symbol with no children."""
+    text = json.dumps(["scalar"])
+    symbols = lsp_server.document_symbols(text)
+    assert symbols[0]["children"] == []
+    assert symbols[0]["detail"] == ""
+
+
+def test_document_symbols_line_fallback_when_offset_missing(monkeypatch):
+    """A record index beyond the located offsets falls back to line 0."""
+    monkeypatch.setattr(lsp_server, "_record_line_offsets", lambda text: [])
+    symbols = lsp_server.document_symbols(json.dumps([{"a": 1}]))
+    assert symbols[0]["line"] == 0
+
+
+def test_document_symbols_empty_and_malformed():
+    """Empty arrays yield no symbols; malformed JSON yields an empty outline."""
+    assert lsp_server.document_symbols("[]") == []
+    assert lsp_server.document_symbols("[{not json}]") == []
+
+
+# ---------------------------------------------------------------------------
+# (E) Formatting.
+# ---------------------------------------------------------------------------
+def test_format_text_formats_valid_and_preserves_key_order():
+    """Valid JSON is pretty-printed with 2-space indent, key order kept."""
+    formatted = lsp_server.format_text('[{"b":1,"a":2}]')
+    assert formatted == '[\n  {\n    "b": 1,\n    "a": 2\n  }\n]\n'
+
+
+def test_format_text_tolerates_jsonc():
+    """JSONC sugar is normalised away during formatting."""
+    formatted = lsp_server.format_text('[{"a":1,},// c\n]')
+    assert formatted == '[\n  {\n    "a": 1\n  }\n]\n'
+
+
+def test_format_text_invalid_returns_none():
+    """Invalid JSON returns ``None`` (document left unchanged)."""
+    assert lsp_server.format_text("[{not json}]") is None
+
+
+# ---------------------------------------------------------------------------
+# (F) New LSP glue handlers, driven with stubs.
+# ---------------------------------------------------------------------------
+def test_to_document_symbols_maps_kinds_and_detail():
+    """The mapper sets kinds, ranges, nests children, and blanks empty detail."""
+    raw = [
+        {
+            "name": "Record 1",
+            "detail": "ID-1",
+            "kind": "record",
+            "line": 2,
+            "children": [
+                {
+                    "name": "f",
+                    "detail": "",
+                    "kind": "field",
+                    "line": 2,
+                    "children": [],
+                },
+                {
+                    "name": "g",
+                    "detail": "v",
+                    "kind": "mystery",
+                    "line": 2,
+                    "children": [],
+                },
+            ],
+        }
+    ]
+    symbols = lsp_server._to_document_symbols(raw)
+    assert symbols[0].kind == lsp.SymbolKind.Object
+    assert symbols[0].detail == "ID-1"
+    assert symbols[0].range.start.line == 2
+    child_empty, child_unknown = symbols[0].children
+    assert child_empty.kind == lsp.SymbolKind.Field
+    # Empty detail is mapped to None.
+    assert child_empty.detail is None
+    # Unknown kind falls back to Field.
+    assert child_unknown.kind == lsp.SymbolKind.Field
+
+
+def test_document_symbol_handler_returns_symbols(reversal_record):
+    """``document_symbol`` returns ``DocumentSymbol`` objects for the doc."""
+    document = _FakeDocument("[" + json.dumps(dict(reversal_record)) + "]")
+    ls = _FakeLanguageServer(document)
+    params = lsp.DocumentSymbolParams(
+        text_document=lsp.TextDocumentIdentifier(uri="file:///doc.json")
+    )
+    result = lsp_server.document_symbol(ls, params)
+    assert result
+    assert all(isinstance(sym, lsp.DocumentSymbol) for sym in result)
+    assert result[0].children
+
+
+def test_formatting_handler_returns_single_edit(reversal_record):
+    """``formatting`` returns one full-document ``TextEdit`` for valid JSON."""
+    source = '[{"b":1,"a":2}]'
+    document = _FakeDocument(source)
+    ls = _FakeLanguageServer(document)
+    params = lsp.DocumentFormattingParams(
+        text_document=lsp.TextDocumentIdentifier(uri="file:///doc.json"),
+        options=lsp.FormattingOptions(tab_size=2, insert_spaces=True),
+    )
+    result = lsp_server.formatting(ls, params)
+    assert len(result) == 1
+    assert result[0].new_text == '[\n  {\n    "b": 1,\n    "a": 2\n  }\n]\n'
+    assert result[0].range.start.line == 0
+    assert result[0].range.end.line == 1
+
+
+def test_formatting_handler_invalid_returns_no_edits():
+    """``formatting`` returns no edits for invalid JSON (unchanged doc)."""
+    document = _FakeDocument("[{not json}]")
+    ls = _FakeLanguageServer(document)
+    params = lsp.DocumentFormattingParams(
+        text_document=lsp.TextDocumentIdentifier(uri="file:///doc.json"),
+        options=lsp.FormattingOptions(tab_size=2, insert_spaces=True),
+    )
+    assert lsp_server.formatting(ls, params) == []
+
+
+# ---------------------------------------------------------------------------
+# (G) Message-type hover.
+# ---------------------------------------------------------------------------
+def test_message_type_name_known_and_unknown():
+    """A supported message type resolves to its name; others -> None."""
+    name = lsp_server.message_type_name("camt.053.001.14")
+    assert name == "Bank To Customer Statement"
+    assert lsp_server.message_type_name("reason_code") is None
+    assert lsp_server.message_type_name("camt.999.999.99") is None
+
+
+def test_hover_markup_message_type_field_and_unknown():
+    """Hover markup covers message-type, field, and unknown tokens."""
+    markup = lsp_server.hover_markup("camt.053.001.14")
+    assert markup == "camt.053.001.14 — Bank To Customer Statement"
+    field = lsp_server.hover_markup("account_servicer_bic")
+    assert field and "camt.053" not in field
+    assert lsp_server.hover_markup("nope") is None
+
+
+def test_hover_handler_message_type_returns_hover():
+    """``hover`` returns the message-type name for a message-type token."""
+    document = _FakeDocument("[]", word="camt.053.001.14")
+    ls = _FakeLanguageServer(document)
+    params = lsp.HoverParams(
+        text_document=lsp.TextDocumentIdentifier(uri="file:///doc.json"),
+        position=lsp.Position(line=0, character=1),
+    )
+    result = lsp_server.hover(ls, params)
+    assert isinstance(result, lsp.Hover)
+    assert result.contents == "camt.053.001.14 — Bank To Customer Statement"
+
+
+# ---------------------------------------------------------------------------
+# (H) Code actions.
+# ---------------------------------------------------------------------------
+def test_code_actions_missing_fields_proposes_action():
+    """A record missing required fields proposes a quick-fix with an edit."""
+    text = '[\n  {"statement_msg_id": "X"}\n]'
+    actions = lsp_server.code_actions(text)
+    assert len(actions) == 1
+    action = actions[0]
+    # ``statement_msg_id`` is present; the rest of the required set is missing.
+    assert "amount" in action["fields"]
+    assert "statement_msg_id" not in action["fields"]
+    assert "amount" in action["title"]
+    # Insertion is just after the record's opening brace on its line.
+    assert action["line"] == 1
+    assert action["character"] == 3
+    assert '"amount": ""' in action["new_text"]
+
+
+def test_code_actions_valid_record_yields_none(reversal_record):
+    """A complete record produces no code action."""
+    text = json.dumps([dict(reversal_record)])
+    assert lsp_server.code_actions(text) == []
+
+
+def test_code_actions_malformed_json_yields_none():
+    """Malformed JSON produces no code actions."""
+    assert lsp_server.code_actions("[{not json}]") == []
+
+
+def test_code_actions_empty_records_yields_none():
+    """An empty array (no records) produces no code actions."""
+    assert lsp_server.code_actions("[]") == []
+
+
+def test_code_actions_skips_non_dict_record():
+    """A non-dict record is skipped by the code-action loop."""
+    assert lsp_server.code_actions(json.dumps(["scalar"])) == []
+
+
+def test_code_actions_line_fallback_when_offset_missing(monkeypatch):
+    """A record index beyond the located offsets falls back to line 0."""
+    monkeypatch.setattr(lsp_server, "_record_line_offsets", lambda text: [])
+    actions = lsp_server.code_actions(json.dumps([{"statement_msg_id": "X"}]))
+    assert actions
+    assert actions[0]["line"] == 0
+    assert '"amount": ""' in actions[0]["new_text"]
+
+
+def test_code_actions_no_brace_uses_default_indent(monkeypatch):
+    """When the record's line holds no ``{``, the default indent is used."""
+    # Force line 0 (which has no brace: it's the bare opening bracket here)
+    # for a record by faking offsets, and split so the brace is on line 1.
+    monkeypatch.setattr(lsp_server, "_record_line_offsets", lambda text: [0])
+    text = '[\n{"statement_msg_id": "X"}\n]'
+    actions = lsp_server.code_actions(text)
+    assert actions
+    # Line 0 is "[" -> no brace -> two-space default indent, insert at line end.
+    assert actions[0]["line"] == 0
+    assert actions[0]["character"] == 1
+    assert '\n  "amount": ""' in actions[0]["new_text"]
+
+
+def test_code_action_handler_returns_code_actions():
+    """``code_action`` returns ``CodeAction`` objects with workspace edits."""
+    document = _FakeDocument('[\n  {"statement_msg_id": "X"}\n]')
+    ls = _FakeLanguageServer(document)
+    params = lsp.CodeActionParams(
+        text_document=lsp.TextDocumentIdentifier(uri="file:///doc.json"),
+        range=lsp.Range(
+            start=lsp.Position(line=0, character=0),
+            end=lsp.Position(line=0, character=0),
+        ),
+        context=lsp.CodeActionContext(diagnostics=[]),
+    )
+    result = lsp_server.code_action(ls, params)
+    assert len(result) == 1
+    action = result[0]
+    assert isinstance(action, lsp.CodeAction)
+    assert action.kind == lsp.CodeActionKind.QuickFix
+    edits = action.edit.changes["file:///doc.json"]
+    assert len(edits) == 1
+    assert '"amount": ""' in edits[0].new_text
+
+
+def test_code_action_handler_no_actions_for_valid(reversal_record):
+    """``code_action`` returns no actions for a valid document."""
+    document = _FakeDocument(json.dumps([dict(reversal_record)]))
+    ls = _FakeLanguageServer(document)
+    params = lsp.CodeActionParams(
+        text_document=lsp.TextDocumentIdentifier(uri="file:///doc.json"),
+        range=lsp.Range(
+            start=lsp.Position(line=0, character=0),
+            end=lsp.Position(line=0, character=0),
+        ),
+        context=lsp.CodeActionContext(diagnostics=[]),
+    )
+    assert lsp_server.code_action(ls, params) == []

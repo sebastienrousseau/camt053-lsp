@@ -163,12 +163,29 @@ records, or a single record object treated as one record):
   position.
 - **Completion** — every input field for the message type (with its schema
   description as the detail) plus every supported `camt` message type.
-- **Hover** — the schema `description` for the field name under the cursor.
+- **Hover** — the schema `description` for the field name under the cursor, or
+  the human-readable name when the token is a supported `camt.05x` message type
+  (e.g. `camt.053.001.14 — Bank To Customer Statement`).
+- **Code actions** — for each record missing required fields, a quick-fix
+  inserts the missing keys (with empty placeholder values) into that record.
+  Valid records and malformed JSON propose no action.
+- **Document symbols (outline)** — one symbol per record (named `Record N`,
+  with its `statement_msg_id` / `entry_ref` as the detail) and a child symbol
+  for every field, so editors can render an outline / breadcrumb. Malformed
+  JSON yields an empty outline.
+- **Formatting** — pretty-prints the whole document with a stable 2-space
+  indent while preserving key order, returned as a single full-document edit.
+  Invalid JSON leaves the document unchanged.
+- **JSONC tolerance** — `//` line comments and trailing commas are stripped
+  before parsing, so all of the above work on JSONC data files. Clean JSON is
+  unaffected. (YAML data files are a planned future enhancement.)
 
 The feature logic lives in pure, importable helpers (`compute_diagnostics`,
-`completion_items`, `hover_text`) backed by the shared `camt053.services` layer,
-so editor behaviour stays in lockstep with the CLI, REST API, and MCP server.
-The LSP handlers are thin glue that map those plain dicts to `lsprotocol` types.
+`completion_items`, `hover_text`, `hover_markup`, `message_type_name`,
+`code_actions`, `document_symbols`, `format_text`) backed by the shared
+`camt053.services` layer, so editor behaviour stays in lockstep with
+the CLI, REST API, and MCP server. The LSP handlers are thin glue that map those
+plain dicts to `lsprotocol` types.
 
 ## Using the helpers
 
@@ -179,8 +196,12 @@ server process required. This is exactly what the server runs on each edit:
 import json
 
 from camt053_lsp.server import (
+    code_actions,
     completion_items,
     compute_diagnostics,
+    document_symbols,
+    format_text,
+    hover_markup,
     hover_text,
 )
 
@@ -217,6 +238,26 @@ items = completion_items()
 print(len(items), "completion items, e.g.", items[0]["label"])
 print(hover_text("account_servicer_bic"))   # -> the field's schema description
 print(hover_text("nope"))                    # -> None
+
+# Hover markup also names a message type under the cursor.
+print(hover_markup("camt.053.001.14"))       # -> "camt.053.001.14 — Bank ..."
+
+# Code actions propose inserting a record's missing required fields.
+fixes = code_actions(missing)
+print(fixes[0]["title"])                     # -> "Insert missing required ..."
+print(code_actions(valid_doc))               # -> [] (nothing to fix)
+
+# Document symbols build an outline: one symbol per record, fields as children.
+outline = document_symbols(valid_doc)
+print(outline[0]["name"], "->", len(outline[0]["children"]), "fields")
+
+# Formatting pretty-prints the document (2-space indent, key order preserved).
+print(format_text('[{"b":1,"a":2}]'))        # -> formatted JSON string
+print(format_text("[{not json}]"))           # -> None (left unchanged)
+
+# JSONC sugar (// comments, trailing commas) is tolerated everywhere.
+jsonc = '[\n  // a record\n  {"statement_msg_id": "ID-1",},\n]'
+print(compute_diagnostics(jsonc)[:1])        # parses fine
 ```
 
 Each diagnostic is a plain dict —
