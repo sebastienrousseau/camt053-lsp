@@ -614,3 +614,136 @@ def test_formatting_handler_invalid_returns_no_edits():
         options=lsp.FormattingOptions(tab_size=2, insert_spaces=True),
     )
     assert lsp_server.formatting(ls, params) == []
+
+
+# ---------------------------------------------------------------------------
+# (G) Message-type hover.
+# ---------------------------------------------------------------------------
+def test_message_type_name_known_and_unknown():
+    """A supported message type resolves to its name; others -> None."""
+    name = lsp_server.message_type_name("camt.053.001.14")
+    assert name == "Bank To Customer Statement"
+    assert lsp_server.message_type_name("reason_code") is None
+    assert lsp_server.message_type_name("camt.999.999.99") is None
+
+
+def test_hover_markup_message_type_field_and_unknown():
+    """Hover markup covers message-type, field, and unknown tokens."""
+    markup = lsp_server.hover_markup("camt.053.001.14")
+    assert markup == "camt.053.001.14 — Bank To Customer Statement"
+    field = lsp_server.hover_markup("account_servicer_bic")
+    assert field and "camt.053" not in field
+    assert lsp_server.hover_markup("nope") is None
+
+
+def test_hover_handler_message_type_returns_hover():
+    """``hover`` returns the message-type name for a message-type token."""
+    document = _FakeDocument("[]", word="camt.053.001.14")
+    ls = _FakeLanguageServer(document)
+    params = lsp.HoverParams(
+        text_document=lsp.TextDocumentIdentifier(uri="file:///doc.json"),
+        position=lsp.Position(line=0, character=1),
+    )
+    result = lsp_server.hover(ls, params)
+    assert isinstance(result, lsp.Hover)
+    assert result.contents == "camt.053.001.14 — Bank To Customer Statement"
+
+
+# ---------------------------------------------------------------------------
+# (H) Code actions.
+# ---------------------------------------------------------------------------
+def test_code_actions_missing_fields_proposes_action():
+    """A record missing required fields proposes a quick-fix with an edit."""
+    text = '[\n  {"statement_msg_id": "X"}\n]'
+    actions = lsp_server.code_actions(text)
+    assert len(actions) == 1
+    action = actions[0]
+    # ``statement_msg_id`` is present; the rest of the required set is missing.
+    assert "amount" in action["fields"]
+    assert "statement_msg_id" not in action["fields"]
+    assert "amount" in action["title"]
+    # Insertion is just after the record's opening brace on its line.
+    assert action["line"] == 1
+    assert action["character"] == 3
+    assert '"amount": ""' in action["new_text"]
+
+
+def test_code_actions_valid_record_yields_none(reversal_record):
+    """A complete record produces no code action."""
+    text = json.dumps([dict(reversal_record)])
+    assert lsp_server.code_actions(text) == []
+
+
+def test_code_actions_malformed_json_yields_none():
+    """Malformed JSON produces no code actions."""
+    assert lsp_server.code_actions("[{not json}]") == []
+
+
+def test_code_actions_empty_records_yields_none():
+    """An empty array (no records) produces no code actions."""
+    assert lsp_server.code_actions("[]") == []
+
+
+def test_code_actions_skips_non_dict_record():
+    """A non-dict record is skipped by the code-action loop."""
+    assert lsp_server.code_actions(json.dumps(["scalar"])) == []
+
+
+def test_code_actions_line_fallback_when_offset_missing(monkeypatch):
+    """A record index beyond the located offsets falls back to line 0."""
+    monkeypatch.setattr(lsp_server, "_record_line_offsets", lambda text: [])
+    actions = lsp_server.code_actions(json.dumps([{"statement_msg_id": "X"}]))
+    assert actions
+    assert actions[0]["line"] == 0
+    assert '"amount": ""' in actions[0]["new_text"]
+
+
+def test_code_actions_no_brace_uses_default_indent(monkeypatch):
+    """When the record's line holds no ``{``, the default indent is used."""
+    # Force line 0 (which has no brace: it's the bare opening bracket here)
+    # for a record by faking offsets, and split so the brace is on line 1.
+    monkeypatch.setattr(lsp_server, "_record_line_offsets", lambda text: [0])
+    text = '[\n{"statement_msg_id": "X"}\n]'
+    actions = lsp_server.code_actions(text)
+    assert actions
+    # Line 0 is "[" -> no brace -> two-space default indent, insert at line end.
+    assert actions[0]["line"] == 0
+    assert actions[0]["character"] == 1
+    assert '\n  "amount": ""' in actions[0]["new_text"]
+
+
+def test_code_action_handler_returns_code_actions():
+    """``code_action`` returns ``CodeAction`` objects with workspace edits."""
+    document = _FakeDocument('[\n  {"statement_msg_id": "X"}\n]')
+    ls = _FakeLanguageServer(document)
+    params = lsp.CodeActionParams(
+        text_document=lsp.TextDocumentIdentifier(uri="file:///doc.json"),
+        range=lsp.Range(
+            start=lsp.Position(line=0, character=0),
+            end=lsp.Position(line=0, character=0),
+        ),
+        context=lsp.CodeActionContext(diagnostics=[]),
+    )
+    result = lsp_server.code_action(ls, params)
+    assert len(result) == 1
+    action = result[0]
+    assert isinstance(action, lsp.CodeAction)
+    assert action.kind == lsp.CodeActionKind.QuickFix
+    edits = action.edit.changes["file:///doc.json"]
+    assert len(edits) == 1
+    assert '"amount": ""' in edits[0].new_text
+
+
+def test_code_action_handler_no_actions_for_valid(reversal_record):
+    """``code_action`` returns no actions for a valid document."""
+    document = _FakeDocument(json.dumps([dict(reversal_record)]))
+    ls = _FakeLanguageServer(document)
+    params = lsp.CodeActionParams(
+        text_document=lsp.TextDocumentIdentifier(uri="file:///doc.json"),
+        range=lsp.Range(
+            start=lsp.Position(line=0, character=0),
+            end=lsp.Position(line=0, character=0),
+        ),
+        context=lsp.CodeActionContext(diagnostics=[]),
+    )
+    assert lsp_server.code_action(ls, params) == []

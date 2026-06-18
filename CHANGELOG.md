@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Code actions** — a `code_actions` helper and a `textDocument/codeAction`
+  handler that, for each record missing required fields (from
+  `services.get_required_fields`), propose a quick-fix that inserts the missing
+  keys (with empty placeholder values) into that record. Valid records and
+  malformed JSON propose no action
+- **Message-type hover** — hovering a supported `camt.05x` message-type token
+  now shows its human-readable name (e.g.
+  `camt.053.001.14 — Bank To Customer Statement`) via the new `hover_markup` /
+  `message_type_name` helpers; field-description hover is unchanged
 - **Document symbols (outline)** — a `document_symbols` helper and a
   `textDocument/documentSymbol` handler that produce one symbol per record
   (named `Record N`, with `statement_msg_id` / `entry_ref` as detail) and a

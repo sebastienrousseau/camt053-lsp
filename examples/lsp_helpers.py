@@ -13,8 +13,10 @@ helpers that you can call directly — exactly what the server runs on each edit
 import json
 
 from camt053_lsp.server import (
+    code_actions,
     completion_items,
     compute_diagnostics,
+    hover_markup,
     hover_text,
 )
 
@@ -55,3 +57,9 @@ items = completion_items()
 print(f"completion items:          {len(items)} (e.g. {items[0]['label']})")
 print("hover account_servicer_bic:", hover_text("account_servicer_bic"))
 print("hover unknown field:       ", hover_text("nope"))
+print("hover message type:        ", hover_markup("camt.053.001.14"))
+
+# --- Code actions: insert a record's missing required fields ----------------
+fixes = code_actions(missing)
+print("code action title:         ", fixes[0]["title"] if fixes else None)
+print("code actions (valid doc):  ", code_actions(valid_doc))

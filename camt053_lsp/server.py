@@ -27,7 +27,10 @@ API, and MCP server:
   IBAN / BIC validators.
 * **Completion** - every input field (with its description) plus the list of
   supported message types are offered as completion items.
-* **Hover** - hovering a field name shows its schema description.
+* **Hover** - hovering a field name shows its schema description; hovering a
+  supported ``camt.05x`` message type shows its human-readable name.
+* **Code actions** - for each record missing required fields, a quick-fix
+  inserts the missing keys (with placeholder values) into that record.
 * **Document symbols (outline)** - one symbol per record (with its
   ``statement_msg_id`` / ``entry_ref`` as detail) and a child symbol per field.
 * **Formatting** - pretty-prints the document with a stable 2-space indent
@@ -60,6 +63,7 @@ server whose ``cmd`` is ``{ "camt053-lsp" }`` and ``filetypes`` includes
 
 The business logic lives in pure, testable helper functions
 (:func:`compute_diagnostics`, :func:`completion_items`, :func:`hover_text`,
+:func:`hover_markup`, :func:`message_type_name`, :func:`code_actions`,
 :func:`document_symbols`, :func:`format_text`); the LSP handlers below are thin
 glue that map those plain dicts to ``lsprotocol`` types.
 """
@@ -369,6 +373,111 @@ def hover_text(
     return description or None
 
 
+def message_type_name(token: str) -> str | None:
+    """Return the human-readable name for a supported message type token.
+
+    Args:
+        token: A candidate ``camt.05x`` message-type string.
+
+    Returns:
+        The message type's name (e.g. ``"Bank To Customer Statement"``) when
+        ``token`` is a supported message type, otherwise ``None``.
+    """
+    for entry in services.list_message_types():
+        if entry["message_type"] == token:
+            return str(entry["name"])
+    return None
+
+
+def hover_markup(
+    token: str, message_type: str = DEFAULT_MESSAGE_TYPE
+) -> str | None:
+    """Return hover text for ``token`` (a field name or a message type).
+
+    A supported ``camt.05x`` message-type token resolves to a
+    ``"<type> — <name>"`` string; otherwise the token is treated as a field name
+    and its schema description is returned (see :func:`hover_text`). Unknown
+    tokens return ``None``.
+
+    Args:
+        token: The word under the cursor.
+        message_type: The camt message type whose field schema is consulted.
+
+    Returns:
+        The hover markup string, or ``None`` if the token is neither a known
+        message type nor a described field.
+    """
+    name = message_type_name(token)
+    if name is not None:
+        return f"{token} — {name}"
+    return hover_text(token, message_type)
+
+
+def code_actions(
+    text: str, message_type: str = DEFAULT_MESSAGE_TYPE
+) -> list[dict]:
+    """Propose quick-fix actions inserting missing required fields.
+
+    For each record missing one or more fields from
+    :func:`camt053.services.get_required_fields`, a quick-fix action is proposed
+    whose edit inserts the missing keys (with empty-string placeholder values)
+    into that record object. The insertion point and indentation are derived
+    from the record's opening-brace line via the :func:`_record_line_offsets`
+    heuristic. Valid records yield no action; malformed JSON (or input that is
+    not a list/dict of records) yields an empty list.
+
+    Args:
+        text: The raw (possibly JSONC) document text.
+        message_type: The camt message type whose required fields are used.
+
+    Returns:
+        A list of plain dicts::
+
+            {"title": str, "fields": list[str], "line": int,
+             "character": int, "new_text": str}
+
+        where ``line`` / ``character`` is the insertion position (just after the
+        record's opening ``{``) and ``new_text`` is the text to insert.
+    """
+    try:
+        parsed = _loads_tolerant(text)
+    except json.JSONDecodeError:
+        return []
+
+    records = _normalise_records(parsed)
+    if not records:
+        return []
+
+    required = services.get_required_fields(message_type)
+    line_offsets = _record_line_offsets(text)
+    lines = text.splitlines()
+
+    actions: list[dict] = []
+    for index, record in enumerate(records):
+        if not isinstance(record, dict):
+            continue
+        missing = [field for field in required if field not in record]
+        if not missing:
+            continue
+        line = line_offsets[index] if index < len(line_offsets) else 0
+        source_line = lines[line] if 0 <= line < len(lines) else ""
+        brace = source_line.find("{")
+        character = brace + 1 if brace >= 0 else len(source_line)
+        indent = " " * (brace + 2) if brace >= 0 else "  "
+        insert = "".join(f'\n{indent}"{field}": "",' for field in missing)
+        actions.append(
+            {
+                "title": "Insert missing required field(s): "
+                + ", ".join(missing),
+                "fields": missing,
+                "line": line,
+                "character": character,
+                "new_text": insert,
+            }
+        )
+    return actions
+
+
 def document_symbols(text: str) -> list[dict]:
     """Return an outline of the document: one symbol per record.
 
@@ -557,12 +666,12 @@ def completion(
 
 @server.feature(lsp.TEXT_DOCUMENT_HOVER)
 def hover(ls: LanguageServer, params: lsp.HoverParams) -> lsp.Hover | None:
-    """Show the schema description for the field under the cursor."""
+    """Show the schema description or message-type name under the cursor."""
     document = ls.workspace.get_text_document(params.text_document.uri)
     word = document.word_at_position(params.position)
     if not word:
         return None
-    text = hover_text(word)
+    text = hover_markup(word)
     if text is None:
         return None
     return lsp.Hover(contents=text)
@@ -593,6 +702,30 @@ def formatting(
         end=lsp.Position(line=end_line, character=0),
     )
     return [lsp.TextEdit(range=rng, new_text=formatted)]
+
+
+@server.feature(lsp.TEXT_DOCUMENT_CODE_ACTION)
+def code_action(
+    ls: LanguageServer, params: lsp.CodeActionParams
+) -> list[lsp.CodeAction]:
+    """Offer quick-fixes that insert a record's missing required fields."""
+    document = ls.workspace.get_text_document(params.text_document.uri)
+    uri = params.text_document.uri
+    actions: list[lsp.CodeAction] = []
+    for raw in code_actions(document.source):
+        position = lsp.Position(line=raw["line"], character=raw["character"])
+        edit = lsp.TextEdit(
+            range=lsp.Range(start=position, end=position),
+            new_text=raw["new_text"],
+        )
+        actions.append(
+            lsp.CodeAction(
+                title=raw["title"],
+                kind=lsp.CodeActionKind.QuickFix,
+                edit=lsp.WorkspaceEdit(changes={uri: [edit]}),
+            )
+        )
+    return actions
 
 
 def main() -> None:
