@@ -28,6 +28,16 @@ API, and MCP server:
 * **Completion** - every input field (with its description) plus the list of
   supported message types are offered as completion items.
 * **Hover** - hovering a field name shows its schema description.
+* **Document symbols (outline)** - one symbol per record (with its
+  ``statement_msg_id`` / ``entry_ref`` as detail) and a child symbol per field.
+* **Formatting** - pretty-prints the document with a stable 2-space indent
+  while preserving key order.
+
+Parsing is tolerant of JSONC: ``//`` line comments and trailing commas are
+stripped before the document is handed to the standard-library JSON parser, so
+all features work on JSONC data files while clean JSON behaves exactly as
+before. (YAML data files are noted as a future enhancement and are not yet
+supported.)
 
 The intended message type defaults to ``camt.053.001.14`` (Bank to Customer
 Statement); the pure helpers accept a ``message_type`` argument so a different
@@ -49,9 +59,9 @@ server whose ``cmd`` is ``{ "camt053-lsp" }`` and ``filetypes`` includes
 ``"json"``. VS Code clients spawn the same command over stdio.
 
 The business logic lives in pure, testable helper functions
-(:func:`compute_diagnostics`, :func:`completion_items`, :func:`hover_text`); the
-LSP handlers below are thin glue that map those plain dicts to ``lsprotocol``
-types.
+(:func:`compute_diagnostics`, :func:`completion_items`, :func:`hover_text`,
+:func:`document_symbols`, :func:`format_text`); the LSP handlers below are thin
+glue that map those plain dicts to ``lsprotocol`` types.
 """
 
 from __future__ import annotations
@@ -77,6 +87,89 @@ _IDENTIFIER_FIELDS = {
 # ---------------------------------------------------------------------------
 # Pure helpers (no LSP/server I/O - directly unit-testable)
 # ---------------------------------------------------------------------------
+def _strip_jsonc(text: str) -> str:
+    """Strip JSONC sugar (``//`` line comments, trailing commas) to plain JSON.
+
+    A dependency-free pre-step so JSONC data files parse with the standard
+    library. ``//`` only starts a comment outside of strings; ``"`` quoting and
+    backslash escapes are tracked so comment markers and commas inside string
+    values are preserved. Clean JSON is returned unchanged in substance (only
+    superfluous trailing commas / comments are removed).
+
+    Args:
+        text: The raw (possibly JSONC) document text.
+
+    Returns:
+        The text with line comments removed and trailing commas dropped.
+    """
+    out: list[str] = []
+    in_string = False
+    escaped = False
+    i = 0
+    length = len(text)
+    while i < length:
+        ch = text[i]
+        if in_string:
+            out.append(ch)
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+            i += 1
+            continue
+        if ch == '"':
+            in_string = True
+            out.append(ch)
+            i += 1
+            continue
+        if ch == "/" and i + 1 < length and text[i + 1] == "/":
+            # Skip to (but keep) the end-of-line.
+            while i < length and text[i] != "\n":
+                i += 1
+            continue
+        out.append(ch)
+        i += 1
+
+    stripped = "".join(out)
+    # Drop trailing commas that immediately precede a closing ``}`` or ``]``
+    # (optionally separated by whitespace), again only outside of strings.
+    result: list[str] = []
+    in_string = False
+    escaped = False
+    for idx, ch in enumerate(stripped):
+        if in_string:
+            result.append(ch)
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+            continue
+        if ch == '"':
+            in_string = True
+            result.append(ch)
+            continue
+        if ch == ",":
+            rest = stripped[idx + 1 :]
+            if rest.lstrip()[:1] in ("}", "]"):
+                continue
+        result.append(ch)
+    return "".join(result)
+
+
+def _loads_tolerant(text: str) -> Any:
+    """Parse ``text`` as JSON, tolerating JSONC comments and trailing commas.
+
+    Clean JSON parses identically to :func:`json.loads`; JSONC sugar is removed
+    by :func:`_strip_jsonc` first. Raises :class:`json.JSONDecodeError` for input
+    that is still not valid JSON.
+    """
+    return json.loads(_strip_jsonc(text))
+
+
 def _normalise_records(parsed: Any) -> list[dict[str, Any]]:
     """Coerce parsed JSON into a list of record dicts.
 
@@ -146,7 +239,7 @@ def compute_diagnostics(
              "severity": "error" | "warning", "message": str}
     """
     try:
-        parsed = json.loads(text)
+        parsed = _loads_tolerant(text)
     except json.JSONDecodeError as exc:
         return [
             {
@@ -276,14 +369,101 @@ def hover_text(
     return description or None
 
 
+def document_symbols(text: str) -> list[dict]:
+    """Return an outline of the document: one symbol per record.
+
+    Each record becomes a parent symbol named ``"Record N"`` (1-indexed) whose
+    detail is the record's ``statement_msg_id`` (falling back to ``entry_ref``)
+    when present. Every field of a record becomes a child symbol named after the
+    field, with its value rendered as the detail. Line numbers reuse the
+    :func:`_record_line_offsets` brace-tracking heuristic; field lines fall back
+    to their record's line.
+
+    Malformed JSON (or input that is not a list/dict of records) yields an empty
+    outline rather than raising.
+
+    Args:
+        text: The raw (possibly JSONC) document text.
+
+    Returns:
+        A list of plain dicts::
+
+            {"name": str, "detail": str, "kind": "record" | "field",
+             "line": int, "children": list[dict]}
+    """
+    try:
+        parsed = _loads_tolerant(text)
+    except json.JSONDecodeError:
+        return []
+
+    records = _normalise_records(parsed)
+    line_offsets = _record_line_offsets(text)
+
+    symbols: list[dict] = []
+    for index, record in enumerate(records):
+        line = line_offsets[index] if index < len(line_offsets) else 0
+        detail = ""
+        children: list[dict] = []
+        if isinstance(record, dict):
+            detail = str(
+                record.get("statement_msg_id") or record.get("entry_ref") or ""
+            )
+            for field, value in record.items():
+                children.append(
+                    {
+                        "name": str(field),
+                        "detail": str(value),
+                        "kind": "field",
+                        "line": line,
+                        "children": [],
+                    }
+                )
+        symbols.append(
+            {
+                "name": f"Record {index + 1}",
+                "detail": detail,
+                "kind": "record",
+                "line": line,
+                "children": children,
+            }
+        )
+    return symbols
+
+
+def format_text(text: str) -> str | None:
+    """Pretty-print the JSON data file with a stable 2-space indent.
+
+    Key order is preserved (not sorted). JSONC sugar (``//`` comments, trailing
+    commas) is tolerated and normalised away. Returns ``None`` for input that is
+    not valid JSON, signalling that the document should be left unchanged.
+
+    Args:
+        text: The raw (possibly JSONC) document text.
+
+    Returns:
+        The formatted JSON string (with a trailing newline), or ``None`` when
+        the input cannot be parsed.
+    """
+    try:
+        parsed = _loads_tolerant(text)
+    except json.JSONDecodeError:
+        return None
+    return json.dumps(parsed, indent=2, ensure_ascii=False) + "\n"
+
+
 # ---------------------------------------------------------------------------
 # LSP glue (thin - maps plain dicts to lsprotocol types)
 # ---------------------------------------------------------------------------
-server = LanguageServer("camt053-lsp", "v0.0.1")
+server = LanguageServer("camt053-lsp", "v0.0.2")
 
 _SEVERITY = {
     "error": lsp.DiagnosticSeverity.Error,
     "warning": lsp.DiagnosticSeverity.Warning,
+}
+
+_SYMBOL_KIND = {
+    "record": lsp.SymbolKind.Object,
+    "field": lsp.SymbolKind.Field,
 }
 
 
@@ -307,6 +487,28 @@ def _to_lsp_diagnostics(raw: list[dict]) -> list[lsp.Diagnostic]:
             )
         )
     return diagnostics
+
+
+def _to_document_symbols(raw: list[dict]) -> list[lsp.DocumentSymbol]:
+    """Map plain outline dicts to ``lsprotocol`` ``DocumentSymbol`` objects."""
+    symbols: list[lsp.DocumentSymbol] = []
+    for item in raw:
+        line = item["line"]
+        rng = lsp.Range(
+            start=lsp.Position(line=line, character=0),
+            end=lsp.Position(line=line, character=0),
+        )
+        symbols.append(
+            lsp.DocumentSymbol(
+                name=item["name"],
+                detail=item["detail"] or None,
+                kind=_SYMBOL_KIND.get(item["kind"], lsp.SymbolKind.Field),
+                range=rng,
+                selection_range=rng,
+                children=_to_document_symbols(item["children"]),
+            )
+        )
+    return symbols
 
 
 def _validate_and_publish(ls: LanguageServer, uri: str) -> None:
@@ -364,6 +566,33 @@ def hover(ls: LanguageServer, params: lsp.HoverParams) -> lsp.Hover | None:
     if text is None:
         return None
     return lsp.Hover(contents=text)
+
+
+@server.feature(lsp.TEXT_DOCUMENT_DOCUMENT_SYMBOL)
+def document_symbol(
+    ls: LanguageServer, params: lsp.DocumentSymbolParams
+) -> list[lsp.DocumentSymbol]:
+    """Provide an outline (records and their fields) for the document."""
+    document = ls.workspace.get_text_document(params.text_document.uri)
+    return _to_document_symbols(document_symbols(document.source))
+
+
+@server.feature(lsp.TEXT_DOCUMENT_FORMATTING)
+def formatting(
+    ls: LanguageServer, params: lsp.DocumentFormattingParams
+) -> list[lsp.TextEdit]:
+    """Pretty-print the whole document as a single full-document edit."""
+    document = ls.workspace.get_text_document(params.text_document.uri)
+    formatted = format_text(document.source)
+    if formatted is None:
+        return []
+    lines = document.source.splitlines()
+    end_line = len(lines)
+    rng = lsp.Range(
+        start=lsp.Position(line=0, character=0),
+        end=lsp.Position(line=end_line, character=0),
+    )
+    return [lsp.TextEdit(range=rng, new_text=formatted)]
 
 
 def main() -> None:

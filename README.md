@@ -164,11 +164,22 @@ records, or a single record object treated as one record):
 - **Completion** — every input field for the message type (with its schema
   description as the detail) plus every supported `camt` message type.
 - **Hover** — the schema `description` for the field name under the cursor.
+- **Document symbols (outline)** — one symbol per record (named `Record N`,
+  with its `statement_msg_id` / `entry_ref` as the detail) and a child symbol
+  for every field, so editors can render an outline / breadcrumb. Malformed
+  JSON yields an empty outline.
+- **Formatting** — pretty-prints the whole document with a stable 2-space
+  indent while preserving key order, returned as a single full-document edit.
+  Invalid JSON leaves the document unchanged.
+- **JSONC tolerance** — `//` line comments and trailing commas are stripped
+  before parsing, so all of the above work on JSONC data files. Clean JSON is
+  unaffected. (YAML data files are a planned future enhancement.)
 
 The feature logic lives in pure, importable helpers (`compute_diagnostics`,
-`completion_items`, `hover_text`) backed by the shared `camt053.services` layer,
-so editor behaviour stays in lockstep with the CLI, REST API, and MCP server.
-The LSP handlers are thin glue that map those plain dicts to `lsprotocol` types.
+`completion_items`, `hover_text`, `document_symbols`, `format_text`) backed by
+the shared `camt053.services` layer, so editor behaviour stays in lockstep with
+the CLI, REST API, and MCP server. The LSP handlers are thin glue that map those
+plain dicts to `lsprotocol` types.
 
 ## Using the helpers
 
@@ -181,6 +192,8 @@ import json
 from camt053_lsp.server import (
     completion_items,
     compute_diagnostics,
+    document_symbols,
+    format_text,
     hover_text,
 )
 
@@ -217,6 +230,18 @@ items = completion_items()
 print(len(items), "completion items, e.g.", items[0]["label"])
 print(hover_text("account_servicer_bic"))   # -> the field's schema description
 print(hover_text("nope"))                    # -> None
+
+# Document symbols build an outline: one symbol per record, fields as children.
+outline = document_symbols(valid_doc)
+print(outline[0]["name"], "->", len(outline[0]["children"]), "fields")
+
+# Formatting pretty-prints the document (2-space indent, key order preserved).
+print(format_text('[{"b":1,"a":2}]'))        # -> formatted JSON string
+print(format_text("[{not json}]"))           # -> None (left unchanged)
+
+# JSONC sugar (// comments, trailing commas) is tolerated everywhere.
+jsonc = '[\n  // a record\n  {"statement_msg_id": "ID-1",},\n]'
+print(compute_diagnostics(jsonc)[:1])        # parses fine
 ```
 
 Each diagnostic is a plain dict —

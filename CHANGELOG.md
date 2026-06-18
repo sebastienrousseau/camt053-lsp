@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Document symbols (outline)** — a `document_symbols` helper and a
+  `textDocument/documentSymbol` handler that produce one symbol per record
+  (named `Record N`, with `statement_msg_id` / `entry_ref` as detail) and a
+  child symbol per field, each with a best-effort line number. Malformed JSON
+  yields an empty outline
+- **Formatting** — a `format_text` helper and a `textDocument/formatting`
+  handler that pretty-print the document with a stable 2-space indent while
+  preserving key order, returned as a single full-document `TextEdit`. Invalid
+  JSON leaves the document unchanged
+- **JSONC tolerance** — a dependency-free pre-step strips `//` line comments and
+  trailing commas before parsing, so diagnostics, symbols, and formatting all
+  work on JSONC data files. Clean JSON behaviour is unchanged
+
+### Deferred
+
+- YAML data-file support is noted as a future enhancement and is not yet
+  implemented (no YAML dependency added in this release)
+
 ## [0.0.1] - 2026-06-16
 
 ### Added
@@ -26,4 +48,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Part of the **camt053 suite** alongside the core `camt053` library and the
   `camt053-mcp` Model Context Protocol server
 
+[Unreleased]: https://github.com/sebastienrousseau/camt053-lsp/compare/v0.0.1...HEAD
 [0.0.1]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.1
