@@ -15,10 +15,10 @@
 completion, and hover as you author the JSON records that drive `camt.053`
 reversal generation.
 
-> **Latest release: v0.0.1** — a [pygls][pygls]-based Language Server with
+> **Latest release: v0.0.3** — a [pygls][pygls]-based Language Server with
 > schema + IBAN/BIC diagnostics, field and message-type completion, and
 > schema-description hover, all backed by `camt053.services`.
-> [See what's new →][release-001]
+> [See what's new →][release-003]
 
 ## Contents
 
@@ -327,7 +327,7 @@ Built on [pygls][pygls] and [lsprotocol][lsprotocol] by the
 [lsp]: https://microsoft.github.io/language-server-protocol/
 [lsprotocol]: https://github.com/microsoft/lsprotocol
 [pygls]: https://github.com/openlawlibrary/pygls
-[release-001]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.1
+[release-003]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.3
 [docs-badge]: https://img.shields.io/badge/Docs-camt053.com-blue?style=for-the-badge
 [docs-url]: https://camt053.com/
 [license-badge]: https://img.shields.io/pypi/l/camt053-lsp?style=for-the-badge
