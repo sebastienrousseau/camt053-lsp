@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "camt053-lsp"
-version = "0.0.4"
+version = "0.0.5"
 description = "Language Server Protocol (LSP) server for authoring camt053 ISO 20022 camt.053 reversing-entry data files."
 authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/sebastienrousseau/camt053-lsp"
-homepage = "https://camt053.com"
+homepage = "https://sebastienrousseau.github.io/camt053/"
 packages = [
     { include = "camt053_lsp" },
 ]

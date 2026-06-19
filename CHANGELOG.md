@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.5] - 2026-06-19
+
+### Fixed
+
+- **Broken documentation links** — the `https://camt053.com` URLs in the README
+  and the `homepage` field in `pyproject.toml` pointed at a domain that no
+  longer resolves. They now point at the published documentation site at
+  <https://sebastienrousseau.github.io/camt053/>
+  ([#4](https://github.com/sebastienrousseau/camt053-lsp/issues/4)).
+
+### Changed
+
+- **Version** — bumped to `0.0.5` as part of the suite-wide lockstep version
+  bump across the `camt053` projects. There are no functional changes to the
+  Language Server in this release beyond the documentation link fix.
+
 ## [0.0.4] - 2026-06-19
 
 ### Added
@@ -87,6 +103,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Part of the **camt053 suite** alongside the core `camt053` library and the
   `camt053-mcp` Model Context Protocol server
 
+[0.0.5]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.5
 [0.0.4]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.4
 [0.0.3]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.3
 [0.0.2]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.2
