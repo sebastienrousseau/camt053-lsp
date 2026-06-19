@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.3] - 2026-06-19
+
+### Fixed
+
+- **Version consistency** — `camt053_lsp.__version__` and the version announced
+  by the `LanguageServer` to clients now match the packaged `pyproject.toml`
+  version. Previously `__version__` was `0.0.1` and the server announced
+  `v0.0.2` while the published package was `0.0.2`, so the reported versions
+  drifted from the actual release. A new version-consistency test asserts that
+  `__version__` equals the `pyproject.toml` `version`, guarding against
+  recurrence.
+
 ## [0.0.2] - 2026-06-18
 
 ### Added
@@ -57,5 +69,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Part of the **camt053 suite** alongside the core `camt053` library and the
   `camt053-mcp` Model Context Protocol server
 
+[0.0.3]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.3
 [0.0.2]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.2
 [0.0.1]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.1
