@@ -15,10 +15,10 @@
 completion, and hover as you author the JSON records that drive `camt.053`
 reversal generation.
 
-> **Latest release: v0.0.4** — a [pygls][pygls]-based Language Server with
+> **Latest release: v0.0.5** — a [pygls][pygls]-based Language Server with
 > schema + IBAN/BIC diagnostics, field and message-type completion, and
 > schema-description hover, all backed by `camt053.services`.
-> [See what's new →][release-004]
+> [See what's new →][release-005]
 
 ## Contents
 
@@ -44,7 +44,7 @@ client (VS Code, Neovim, Helix, Emacs, …). **camt053-lsp** is that backend for
 records that drive ISO 20022 `camt.053` reversal generation in the
 [`camt053`][camt053] suite.
 
-- **Website:** <https://camt053.com>
+- **Website:** <https://sebastienrousseau.github.io/camt053/>
 - **Source code:** <https://github.com/sebastienrousseau/camt053-lsp>
 - **Bug reports:** <https://github.com/sebastienrousseau/camt053-lsp/issues>
 
@@ -327,9 +327,9 @@ Built on [pygls][pygls] and [lsprotocol][lsprotocol] by the
 [lsp]: https://microsoft.github.io/language-server-protocol/
 [lsprotocol]: https://github.com/microsoft/lsprotocol
 [pygls]: https://github.com/openlawlibrary/pygls
-[release-004]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.4
+[release-005]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.5
 [docs-badge]: https://img.shields.io/badge/Docs-camt053.com-blue?style=for-the-badge
-[docs-url]: https://camt053.com/
+[docs-url]: https://sebastienrousseau.github.io/camt053/
 [license-badge]: https://img.shields.io/pypi/l/camt053-lsp?style=for-the-badge
 [pypi-badge]: https://img.shields.io/pypi/v/camt053-lsp?style=for-the-badge
 [python-versions-badge]: https://img.shields.io/pypi/pyversions/camt053-lsp.svg?style=for-the-badge

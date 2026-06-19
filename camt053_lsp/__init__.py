@@ -15,4 +15,4 @@
 
 """camt053-lsp: a Language Server Protocol server for the camt053 library."""
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
