@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Security policy** — a `SECURITY.md` describing supported versions, private
+  vulnerability reporting via GitHub Security Advisories, response timelines,
+  and scope for the Language Server
+- **Dependabot** — weekly dependency update configuration for the `pip` and
+  `github-actions` ecosystems, grouped and labelled for easier review
+- **CodeQL** — a weekly (and push / pull-request) CodeQL scanning workflow
+  running the `security-and-quality` query suite for Python
+- **Bandit** — a `Security Scan` CI job that runs Bandit (`-ll`) over
+  `camt053_lsp/` to catch medium- and high-severity issues
+- **Issue & PR templates** — GitHub bug-report and feature-request issue
+  templates (with a security-advisory contact link) and a pull-request template
+- **CODEOWNERS** — a `CODEOWNERS` file requesting review from the maintainer on
+  all changes
+
 ## [0.0.3] - 2026-06-19
 
 ### Fixed
@@ -69,6 +87,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Part of the **camt053 suite** alongside the core `camt053` library and the
   `camt053-mcp` Model Context Protocol server
 
+[Unreleased]: https://github.com/sebastienrousseau/camt053-lsp/compare/v0.0.3...HEAD
 [0.0.3]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.3
 [0.0.2]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.2
 [0.0.1]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.1
