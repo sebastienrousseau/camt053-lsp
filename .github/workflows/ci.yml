@@ -35,10 +35,13 @@ jobs:
           # to ``pip install -e .`` once camt053 v0.0.6 ships to PyPI.
           pip install "camt053 @ git+https://github.com/sebastienrousseau/camt053@feat/v0.0.6"
           pip install -e .
-          pip install pytest pytest-cov
+          pip install pytest pytest-cov interrogate
 
       - name: Run tests
         run: pytest tests/ -v --tb=short
+
+      - name: Enforce 100% docstring coverage
+        run: interrogate -c pyproject.toml camt053_lsp
 
   lint:
     name: Lint & Type Check
