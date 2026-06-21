@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **In-editor CBPR+ Nov 2026 diagnostics for camt.05x XML documents**.
+  When the LSP opens or receives changes for an XML file (detected by
+  content sniff: leading `<?xml` or bare root element, tolerant of
+  whitespace), it runs
+  `camt053.services.check_cbpr_readiness` and publishes one
+  diagnostic per issue: error-severity for unstructured-only postal
+  addresses (the Nov 2026 reject case) and unknown schemas;
+  warning-severity for deprecated schema versions. The XPath-style
+  location of each `<PstlAdr>` is included in the diagnostic message;
+  precise line/column mapping (via `lxml.sourceline`) is tracked as a
+  v0.0.7 enhancement. JSON reversing-entry documents continue to use
+  the existing record-validation path; the LSP dispatches on document
+  content, so editors do not need new file-type registration.
+
+Part of the v0.0.6 batch tracked in #16.
+
 ## [0.0.5] - 2026-06-19
 
 ### Fixed
