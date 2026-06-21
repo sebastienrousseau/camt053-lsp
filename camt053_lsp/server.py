@@ -74,6 +74,7 @@ import json
 from typing import Any
 
 from camt053 import services
+from camt053.exceptions import Camt053Error
 from lsprotocol import types as lsp
 from pygls.lsp.server import LanguageServer
 
@@ -314,6 +315,64 @@ def compute_diagnostics(
                     }
                 )
 
+    return diagnostics
+
+
+def _looks_like_xml(text: str) -> bool:
+    """Return ``True`` if ``text`` looks like an XML document.
+
+    Used to dispatch between the JSON reversing-entry diagnostics and the
+    XML CBPR+ readiness diagnostics. Tolerates leading whitespace / BOM and
+    accepts either an XML declaration or a bare root element.
+    """
+    stripped = text.lstrip("﻿").lstrip()
+    return stripped.startswith("<?xml") or stripped.startswith("<")
+
+
+def compute_xml_diagnostics(text: str) -> list[dict]:
+    """Compute CBPR+ Nov 2026 diagnostics for a camt.05x XML document.
+
+    Wraps :func:`camt053.services.check_cbpr_readiness`. Each issue from
+    the readiness report becomes one diagnostic. Positions are pinned to
+    line 0 today (XPath-style location is included in the message so the
+    user can navigate); precise line/column mapping requires an
+    ``lxml.sourceline``-aware re-parse and is tracked separately.
+
+    A payload that is not parseable XML (malformed, wrong namespace, or
+    refused by ``camt053.security.xml_guard``) yields a single
+    error-severity diagnostic at line 0.
+
+    Args:
+        text: The raw XML document text.
+
+    Returns:
+        A list of plain dicts with the same shape as the JSON-record
+        diagnostics: ``{"line", "character", "severity", "message"}``.
+    """
+    try:
+        report = services.check_cbpr_readiness(text)
+    except (ValueError, Camt053Error) as exc:
+        return [
+            {
+                "line": 0,
+                "character": 0,
+                "severity": "error",
+                "message": f"CBPR+ check failed: {exc}",
+            }
+        ]
+    diagnostics: list[dict] = []
+    for issue in report["issues"]:
+        diagnostics.append(
+            {
+                "line": 0,
+                "character": 0,
+                "severity": issue["severity"],
+                "message": (
+                    f"{issue['code']} at {issue['path']}: "
+                    f"{issue['message']}"
+                ),
+            }
+        )
     return diagnostics
 
 
@@ -621,9 +680,18 @@ def _to_document_symbols(raw: list[dict]) -> list[lsp.DocumentSymbol]:
 
 
 def _validate_and_publish(ls: LanguageServer, uri: str) -> None:
-    """Compute diagnostics for ``uri`` and publish them to the client."""
+    """Compute diagnostics for ``uri`` and publish them to the client.
+
+    XML documents (detected by content) get CBPR+ Nov 2026 readiness
+    diagnostics; everything else is treated as a JSON reversing-entry
+    document.
+    """
     document = ls.workspace.get_text_document(uri)
-    raw = compute_diagnostics(document.source)
+    source = document.source
+    if _looks_like_xml(source):
+        raw = compute_xml_diagnostics(source)
+    else:
+        raw = compute_diagnostics(source)
     ls.text_document_publish_diagnostics(
         lsp.PublishDiagnosticsParams(
             uri=uri,
