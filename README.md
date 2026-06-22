@@ -114,6 +114,9 @@ python -m pip install -U camt053-lsp
 
 ## Quick Start
 
+For the 10-minute install → editor wiring → first reversing-entry
+edit tutorial, see [`docs/quickstart.md`](docs/quickstart.md).
+
 The package installs a `camt053-lsp` console entry point that starts the
 language server over **stdio**:
 
