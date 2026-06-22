@@ -9,6 +9,7 @@
 [![License][license-badge]][01]
 [![Tests][tests-badge]][tests-url]
 [![Quality][quality-badge]][quality-url]
+[![OpenSSF Scorecard][scorecard-badge]][scorecard-url]
 [![Documentation][docs-badge]][docs-url]
 
 **Real-time editor help for ISO 20022 reversing-entry files** — diagnostics,
@@ -395,5 +396,7 @@ Built on [pygls][pygls] and [lsprotocol][lsprotocol] by the
 [python-versions-badge]: https://img.shields.io/pypi/pyversions/camt053-lsp.svg?style=for-the-badge
 [quality-badge]: https://img.shields.io/github/actions/workflow/status/sebastienrousseau/camt053-lsp/ci.yml?branch=main&label=Quality&style=for-the-badge
 [quality-url]: https://github.com/sebastienrousseau/camt053-lsp/actions/workflows/ci.yml
+[scorecard-badge]: https://api.scorecard.dev/projects/github.com/sebastienrousseau/camt053-lsp/badge?style=for-the-badge
+[scorecard-url]: https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/camt053-lsp
 [tests-badge]: https://img.shields.io/github/actions/workflow/status/sebastienrousseau/camt053-lsp/ci.yml?branch=main&label=Tests&style=for-the-badge
 [tests-url]: https://github.com/sebastienrousseau/camt053-lsp/actions/workflows/ci.yml
