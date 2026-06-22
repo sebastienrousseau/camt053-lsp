@@ -1,0 +1,15 @@
+[
+  {
+    "statement_msg_id": "RVSL-STMT-0001",
+    "creation_date_time": "2026-06-15T08:00:00",
+    "statement_id": "RVSL-STMT-0001",
+    "account_id": "GB29NWBK60161331926819",
+    "account_currency": "EUR",
+    "account_servicer_bic": "NWBKGB2LXXX",
+    "amount": "1500.00",
+    "currency": "EUR",
+    "credit_debit": "DBIT",
+    "reason_code": "AC04",
+    "counterparty_account": "DE89370400440532013000"
+  }
+]
