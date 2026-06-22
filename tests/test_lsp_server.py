@@ -747,3 +747,95 @@ def test_code_action_handler_no_actions_for_valid(reversal_record):
         context=lsp.CodeActionContext(diagnostics=[]),
     )
     assert lsp_server.code_action(ls, params) == []
+
+
+# ─── XML / CBPR+ readiness diagnostics (Nov 14-16 2026 cliff) ───────────────
+
+_CBPR_READY_V08 = (
+    '<?xml version="1.0" encoding="UTF-8"?>'
+    '<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.08">'
+    "<BkToCstmrStmt><GrpHdr><MsgId>M</MsgId>"
+    "<CreDtTm>2026-06-21T10:00:00</CreDtTm></GrpHdr>"
+    "<Stmt><Id>S</Id>"
+    "<Acct><Id><IBAN>DE89370400440532013000</IBAN></Id></Acct>"
+    "</Stmt></BkToCstmrStmt></Document>"
+)
+
+_CBPR_BAD_UNSTRUCTURED = (
+    '<?xml version="1.0" encoding="UTF-8"?>'
+    '<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.08">'
+    "<BkToCstmrStmt><GrpHdr><MsgId>M</MsgId>"
+    "<CreDtTm>2026-06-21T10:00:00</CreDtTm></GrpHdr>"
+    "<Stmt><Id>S</Id>"
+    "<Acct><Id><IBAN>DE89370400440532013000</IBAN></Id></Acct>"
+    "<Ntry><NtryDtls><TxDtls><RltdPties><Cdtr>"
+    "<PstlAdr><AdrLine>Line only</AdrLine></PstlAdr>"
+    "</Cdtr></RltdPties></TxDtls></NtryDtls></Ntry>"
+    "</Stmt></BkToCstmrStmt></Document>"
+)
+
+
+def test_looks_like_xml_detects_xml_decl():
+    """An XML declaration prefix is recognised as XML."""
+    assert lsp_server._looks_like_xml(_CBPR_READY_V08) is True
+
+
+def test_looks_like_xml_detects_bare_root_element():
+    """A bare root element with no XML declaration is also XML."""
+    assert lsp_server._looks_like_xml("<Document/>") is True
+
+
+def test_looks_like_xml_tolerates_leading_whitespace():
+    """Leading whitespace does not defeat the sniff."""
+    assert lsp_server._looks_like_xml("   <Document/>") is True
+
+
+def test_looks_like_xml_rejects_json_documents():
+    """A JSON array or object is not XML."""
+    assert lsp_server._looks_like_xml("[]") is False
+    assert lsp_server._looks_like_xml("{}") is False
+
+
+def test_compute_xml_diagnostics_clean_v08_yields_none():
+    """A clean v08 payload yields no diagnostics."""
+    assert lsp_server.compute_xml_diagnostics(_CBPR_READY_V08) == []
+
+
+def test_compute_xml_diagnostics_unstructured_yields_error():
+    """An unstructured-only address yields one error diagnostic."""
+    diagnostics = lsp_server.compute_xml_diagnostics(_CBPR_BAD_UNSTRUCTURED)
+    assert len(diagnostics) == 1
+    issue = diagnostics[0]
+    assert issue["severity"] == "error"
+    assert "UNSTRUCTURED_ONLY_ADDRESS" in issue["message"]
+    assert "PstlAdr" in issue["message"]
+
+
+def test_compute_xml_diagnostics_malformed_xml_yields_one_diagnostic():
+    """Malformed XML produces a single CBPR+ check failed diagnostic."""
+    diagnostics = lsp_server.compute_xml_diagnostics("<Document>unclosed")
+    assert len(diagnostics) == 1
+    assert diagnostics[0]["severity"] == "error"
+    assert "CBPR+ check failed" in diagnostics[0]["message"]
+
+
+def test_validate_and_publish_dispatches_xml(reversal_record):
+    """Opening an XML file routes through the CBPR+ diagnostic path."""
+    document = _FakeDocument(_CBPR_BAD_UNSTRUCTURED)
+    ls = _FakeLanguageServer(document)
+    lsp_server._validate_and_publish(ls, "file:///statement.xml")
+    assert len(ls.published) == 1
+    diags = ls.published[0].diagnostics
+    assert len(diags) == 1
+    assert diags[0].severity == lsp.DiagnosticSeverity.Error
+    assert "UNSTRUCTURED_ONLY_ADDRESS" in diags[0].message
+
+
+def test_validate_and_publish_still_handles_json_records(reversal_record):
+    """A JSON document still goes through the original validator."""
+    document = _FakeDocument(json.dumps([dict(reversal_record)]))
+    ls = _FakeLanguageServer(document)
+    lsp_server._validate_and_publish(ls, "file:///records.json")
+    # The valid reversal record produces zero diagnostics in the existing
+    # JSON validator path; the test asserts that the JSON dispatch wins.
+    assert ls.published[0].diagnostics == []

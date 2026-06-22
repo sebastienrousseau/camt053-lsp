@@ -29,7 +29,11 @@ reversal generation.
 - [Features](#features)
 - [Using the helpers](#using-the-helpers)
 - [Examples](#examples)
+- [The camt053 suite](#the-camt053-suite)
+- [When not to use camt053-lsp](#when-not-to-use-camt053-lsp)
 - [Development](#development)
+- [Security](#security)
+- [Documentation](#documentation)
 - [License](#license)
 - [Contributing](#contributing)
 - [Acknowledgements](#acknowledgements)
@@ -281,6 +285,42 @@ git clone https://github.com/sebastienrousseau/camt053-lsp.git && cd camt053-lsp
 python examples/lsp_helpers.py
 ```
 
+## The camt053 suite
+
+`camt053-lsp` is part of a set of independently installable packages
+built around the [`camt053`][camt053] library — pick whichever ones
+your stack needs:
+
+| Package | Role |
+| :--- | :--- |
+| [`camt053`](https://pypi.org/project/camt053/) | Core library + CLI + FastAPI REST API |
+| [`camt053-mcp`](https://pypi.org/project/camt053-mcp/) | Model Context Protocol server (for AI agents) |
+| [`camt053-lsp`](https://pypi.org/project/camt053-lsp/) | **Language Server Protocol server (this package)** |
+| [`camt053-writer-xlsx`](https://pypi.org/project/camt053-writer-xlsx/) | Excel `.xlsx` writer for parsed statements |
+| [`camt053-loader-mt940`](https://pypi.org/project/camt053-loader-mt940/) | SWIFT MT940 → camt.053 loader |
+
+Every helper here is a thin typed wrapper over `camt053.services` —
+the same facade the CLI, REST API, and MCP server use — so all four
+interfaces behave identically.
+
+## When not to use camt053-lsp
+
+- **You have no LSP-capable editor.** This server only makes sense
+  paired with an LSP client (VS Code, Neovim, Helix, Sublime LSP,
+  etc.). Scripted / CI use is better served by the camt053 CLI and
+  REST API.
+- **You are authoring camt.053 XML statements** (rather than the
+  reversing-entry JSON the LSP targets). The CBPR+ Nov 2026
+  diagnostics added in v0.0.6 *do* fire on opened XML files (auto-
+  detected by content), but full XML-authoring features (completion,
+  schema-aware hover) are not the LSP's primary mode.
+- **You need single-file linting outside an editor.** Use the CLI:
+  `camt053 check-cbpr-readiness statement.xml` covers the
+  same ground the LSP surfaces on save.
+- **You need to *generate* pain.001 outbound payment files.** Out of
+  scope; use the [`pain001-lsp`](https://github.com/sebastienrousseau/pain001-lsp)
+  for that workflow.
+
 ## Development
 
 **camt053-lsp** uses [Poetry](https://python-poetry.org/) and
@@ -302,6 +342,26 @@ make lint         # ruff + black
 make type-check   # mypy --strict
 make examples     # run the example script
 ```
+
+## Security
+
+`camt053-lsp` is a thin wrapper — every helper delegates to
+`camt053.services`, where the defence-in-depth (defusedxml +
+`xml_guard` byte cap + DOCTYPE / ENTITY pre-flight) lives. The LSP
+itself does no network I/O and treats the open document as
+untrusted text. Reporting practice, supported versions, and the
+full supply-chain posture are documented in
+[`SECURITY.md`](SECURITY.md). Vulnerabilities go via GitHub Private
+Vulnerability Reporting, not public issues.
+
+## Documentation
+
+- [`README.md`](README.md) — this file
+- [`CHANGELOG.md`](CHANGELOG.md) — release notes
+- [`SECURITY.md`](SECURITY.md) — disclosure + supported versions
+- [`SUPPORT.md`](SUPPORT.md) — how to get help
+- [`MAINTAINERS.md`](MAINTAINERS.md) — who can merge
+- [`examples/`](examples/) — runnable scripts
 
 ## License
 
