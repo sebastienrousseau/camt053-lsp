@@ -179,14 +179,14 @@ uvloop = ["uvloop (>=0.15.2) ; sys_platform != \"win32\"", "winloop (>=0.5.0) ; 
 
 [[package]]
 name = "camt053"
-version = "0.0.5"
+version = "0.0.6"
 description = "Camt053 is a Python library for reading ISO 20022 camt Bank-to-Customer Statements (camt.053/052/054) and generating validated reversing entries by return reason code (e.g. AC04 Closed Account)."
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "camt053-0.0.5-py3-none-any.whl", hash = "sha256:106e8629b9074936d7e97a2a1caebb2efe20ac2040d5ed3fe29075fca542699c"},
-    {file = "camt053-0.0.5.tar.gz", hash = "sha256:cb9e8cc4700da688b1d8fe1daa40ca26ea552727477229ff7d64cf3fef1b138d"},
+    {file = "camt053-0.0.6-py3-none-any.whl", hash = "sha256:da8fd6a65346c929f51f05107bfcf0008b800b4822cb2dc0ddfcc87bfcc3d590"},
+    {file = "camt053-0.0.6.tar.gz", hash = "sha256:eef75f31ac09e543e75a25144f008f89e0c5766112a9516eaaf52cb74f5d42ac"},
 ]
 
 [package.dependencies]
@@ -197,12 +197,15 @@ defusedxml = "0.7.1"
 fastapi = ">=0.95"
 httpx = ">=0.23"
 jinja2 = "3.1.6"
-jsonschema = ">=4.20,<4.25"
+jsonschema = ">=4.20,<4.27"
 markupsafe = "2.1.5"
 pygments = ">=2.20.0,<3.0.0"
-rich = "13.7.1"
+rich = "15.0.0"
 uvicorn = {version = ">=0.20", extras = ["standard"]}
 xmlschema = ">=3.4.0,<4.0.0"
+
+[package.extras]
+telemetry = ["opentelemetry-api (>=1.20)"]
 
 [[package]]
 name = "cattrs"
@@ -1631,14 +1634,14 @@ typing-extensions = {version = ">=4.4.0", markers = "python_version < \"3.13\""}
 
 [[package]]
 name = "rich"
-version = "13.7.1"
+version = "15.0.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 optional = false
-python-versions = ">=3.7.0"
+python-versions = ">=3.9.0"
 groups = ["main", "dev"]
 files = [
-    {file = "rich-13.7.1-py3-none-any.whl", hash = "sha256:4edbae314f59eb482f54e9e30bf00d33350aaa94f4bfcd4e9e3110e64d0d7222"},
-    {file = "rich-13.7.1.tar.gz", hash = "sha256:9be308cb1fe2f1f57d67ce99e95af38a1e2bc71ad9813b0e247cf7ffbcc3a432"},
+    {file = "rich-15.0.0-py3-none-any.whl", hash = "sha256:33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb"},
+    {file = "rich-15.0.0.tar.gz", hash = "sha256:edd07a4824c6b40189fb7ac9bc4c52536e9780fbbfbddf6f1e2502c31b068c36"},
 ]
 
 [package.dependencies]
@@ -2380,4 +2383,4 @@ docs = ["jinja2", "sphinx", "sphinx_rtd_theme"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "eac11451b72d4a548583b5840997f70861ec33060bf98fb2b70c209ac7ae74aa"
+content-hash = "94a978f29fd7be3140588ecd773330c6632c2652b613837291af5f6879c9ec57"
