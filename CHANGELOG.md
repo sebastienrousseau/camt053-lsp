@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.7] - 2026-06-25
+
+### Security
+
+Supply-chain and CI hardening to raise the OpenSSF Scorecard rating and clear
+the imported Scorecard code-scanning alerts.
+
+- **Pinned all GitHub Actions to full commit SHAs** (with version comments) in
+  every workflow, replacing mutable tag/branch references
+  (`Pinned-Dependencies`).
+- **Hash-pinned every CI/release pip install** via new
+  `requirements/*.txt` files compiled with `uv pip compile --generate-hashes`
+  and installed with `pip install --require-hashes`. The test job now imports
+  the package through `python -m pytest` (repo root on `sys.path`) instead of
+  an un-pinnable `pip install -e .`. Regenerate with `make pip-compile`.
+- **Applied least-privilege `GITHUB_TOKEN` permissions** in `release.yml`:
+  the top-level token is now read-only, with `contents: write` (and
+  `id-token`/`attestations: write`) granted only on the jobs that need them
+  (`Token-Permissions`).
+- **Added fuzzing** — an Atheris harness (`fuzz/fuzz_parser.py`) exercising the
+  total document-processing entry points, wired into ClusterFuzzLite
+  (`.clusterfuzzlite/`) with PR and scheduled batch workflows (`Fuzzing`).
+- **Hardened checkouts** with `persist-credentials: false` across workflows.
+
 ## [0.0.6] - 2026-06-22
 
 ### Added
