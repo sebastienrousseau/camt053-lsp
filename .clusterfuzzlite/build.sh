@@ -1,14 +1,16 @@
 #!/bin/bash -eu
-# ClusterFuzzLite build script: install the package and compile every
-# fuzz/fuzz_*.py harness into a libFuzzer binary placed in $OUT.
-# compile_python_fuzzer derives the fuzzer name from the file basename.
+# ClusterFuzzLite build script: compile every fuzz/fuzz_*.py harness into a
+# libFuzzer binary placed in $OUT.
 #
-# --collect-data camt053 bundles camt053's non-Python data files (the JSON
-# schemas and XSDs loaded at runtime) into the frozen PyInstaller binary;
-# without them schema-backed entry points raise FileNotFoundError on startup.
+# Runtime deps are installed hash-pinned; the local camt053_lsp package is
+# added to PyInstaller's import search path (--paths) rather than via an
+# un-pinnable `pip install .`. --collect-data camt053 bundles camt053's JSON
+# schemas/XSDs so schema-backed entry points don't raise FileNotFoundError.
 
-pip3 install .
+pip3 install --require-hashes -r "$SRC/camt053-lsp/requirements/fuzz.txt"
 
 for harness in "$SRC"/camt053-lsp/fuzz/fuzz_*.py; do
-  compile_python_fuzzer "$harness" --collect-data camt053
+  compile_python_fuzzer "$harness" \
+    --collect-data camt053 \
+    --paths "$SRC/camt053-lsp"
 done
