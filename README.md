@@ -17,10 +17,13 @@
 completion, and hover as you author the JSON records that drive `camt.053`
 reversal generation.
 
-> **Latest release: v0.0.5** — a [pygls][pygls]-based Language Server with
-> schema + IBAN/BIC diagnostics, field and message-type completion, and
-> schema-description hover, all backed by `camt053.services`.
-> [See what's new →][release-005]
+> **Latest release: v0.0.7** — supply-chain hardening: every GitHub Action
+> SHA-pinned, all CI/release `pip` installs hash-pinned, least-privilege
+> workflow tokens, and continuous fuzzing (Atheris + ClusterFuzzLite) of the
+> document-processing entry points. Built on the [pygls][pygls]-based Language
+> Server with schema + IBAN/BIC diagnostics, field and message-type completion,
+> schema-description hover, code actions, document symbols, and formatting — all
+> backed by `camt053.services`. [See what's new →][release-007]
 
 ## Contents
 
@@ -342,11 +345,19 @@ A `Makefile` orchestrates the quality gates (kept in lockstep with CI):
 
 ```bash
 make check        # all gates (REQUIRED before commit)
-make test         # pytest
+make test         # pytest (100% line + branch coverage enforced)
 make lint         # ruff + black
 make type-check   # mypy --strict
-make examples     # run the example script
+make security     # bandit
+make examples     # run the example scripts
+make fuzz         # run the Atheris fuzz harness locally
+make pip-compile  # regenerate the hash-pinned requirements/*.txt
 ```
+
+CI installs are **hash-pinned**: each job installs from a
+`requirements/*.txt` lockfile (compiled from `requirements/*.in` with
+`uv pip compile --generate-hashes`) using `pip install --require-hashes`.
+Regenerate them with `make pip-compile` after changing a `.in` file.
 
 ## Security
 
@@ -354,8 +365,15 @@ make examples     # run the example script
 `camt053.services`, where the defence-in-depth (defusedxml +
 `xml_guard` byte cap + DOCTYPE / ENTITY pre-flight) lives. The LSP
 itself does no network I/O and treats the open document as
-untrusted text. Reporting practice, supported versions, and the
-full supply-chain posture are documented in
+untrusted text. The text-driven entry points are **continuously
+fuzzed** with [Atheris][atheris] under
+[ClusterFuzzLite](https://google.github.io/clusterfuzzlite/) (see
+[`fuzz/`](fuzz/) and [`.clusterfuzzlite/`](.clusterfuzzlite/)) so
+malformed JSON/JSONC/XML cannot crash the server. Supply-chain
+hardening — SHA-pinned Actions, hash-pinned `pip` installs, and
+least-privilege workflow tokens — is tracked by
+[OpenSSF Scorecard][scorecard-url]. Reporting practice, supported
+versions, and the full posture are documented in
 [`SECURITY.md`](SECURITY.md). Vulnerabilities go via GitHub Private
 Vulnerability Reporting, not public issues.
 
@@ -388,11 +406,12 @@ Built on [pygls][pygls] and [lsprotocol][lsprotocol] by the
 [04]: https://github.com/sebastienrousseau/camt053-lsp/blob/main/CONTRIBUTING.md
 [05]: https://github.com/sebastienrousseau/camt053-lsp/graphs/contributors
 [07]: https://pypi.org/project/camt053-lsp/
+[atheris]: https://github.com/google/atheris
 [camt053]: https://github.com/sebastienrousseau/camt053
 [lsp]: https://microsoft.github.io/language-server-protocol/
 [lsprotocol]: https://github.com/microsoft/lsprotocol
 [pygls]: https://github.com/openlawlibrary/pygls
-[release-005]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.5
+[release-007]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.7
 [docs-badge]: https://img.shields.io/badge/Docs-camt053.com-blue?style=for-the-badge
 [docs-url]: https://sebastienrousseau.github.io/camt053/
 [license-badge]: https://img.shields.io/pypi/l/camt053-lsp?style=for-the-badge

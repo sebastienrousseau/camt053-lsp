@@ -11,15 +11,18 @@ on:
         required: true
         default: "v0.0.1"
 
+# Least privilege at the top level; each job opts into only what it needs.
 permissions:
-  contents: write       # create/update the GitHub Release
-  id-token: write       # OIDC token for PyPI Trusted Publishing + sigstore
-  attestations: write   # write SLSA build provenance attestations
+  contents: read
 
 jobs:
   publish:
     name: Build And Publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: write       # create/update the GitHub Release
+      id-token: write       # OIDC token for PyPI Trusted Publishing + sigstore
+      attestations: write   # write SLSA build provenance attestations
     # Must match the "Environment name" set on the PyPI trusted publisher.
     environment:
       name: pypi
@@ -28,15 +31,17 @@ jobs:
       RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
 
-      - name: Install build tooling
-        run: pip install poetry twine
+      - name: Install build tooling (hash-pinned)
+        run: pip install --require-hashes -r requirements/build.txt
 
       - name: Build distributions
         run: poetry build
@@ -49,7 +54,7 @@ jobs:
       # (Fulcio + Rekor) using the workflow's OIDC identity. Visible on the
       # GitHub workflow run page; verifiable with `gh attestation verify`.
       - name: Generate SLSA build provenance attestation
-        uses: actions/attest-build-provenance@v4
+        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4
         with:
           subject-path: "dist/*"
 
@@ -59,7 +64,7 @@ jobs:
       # the uploaded distributions so PyPI shows them on the project page.
       # ``skip-existing`` keeps re-runs safe.
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # release/v1
         with:
           attestations: true
           skip-existing: true
@@ -81,25 +86,29 @@ jobs:
     name: SBOM (CycloneDX + SPDX + licenses)
     runs-on: ubuntu-latest
     needs: [publish]
+    permissions:
+      contents: write       # upload SBOM + license manifests to the Release
     env:
       RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
 
-      - name: Install Poetry
-        run: pip install poetry
+      - name: Install Poetry (hash-pinned)
+        run: pip install --require-hashes -r requirements/build.txt
 
       - name: Install runtime dependencies
         run: poetry install --no-interaction --only main
 
-      - name: Install SBOM + license tooling
-        run: pip install cyclonedx-bom pip-licenses
+      - name: Install SBOM + license tooling (hash-pinned)
+        run: pip install --require-hashes -r requirements/sbom.txt
 
       - name: Generate CycloneDX SBOM (JSON)
         run: |
@@ -108,7 +117,7 @@ jobs:
             -o "camt053-lsp-${RELEASE_TAG}.cdx.json"
 
       - name: Generate SPDX SBOM (JSON)
-        uses: anchore/sbom-action@v0
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0
         with:
           format: spdx-json
           output-file: "camt053-lsp-${{ env.RELEASE_TAG }}.spdx.json"
@@ -134,7 +143,7 @@ jobs:
 
       - name: Upload SBOM artifact
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: sbom-bundle
           path: |
