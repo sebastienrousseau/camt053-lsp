@@ -20,7 +20,9 @@ reversal generation.
 > **Latest release: v0.0.7** — supply-chain hardening: every GitHub Action
 > SHA-pinned, all CI/release `pip` installs hash-pinned, least-privilege
 > workflow tokens, and continuous fuzzing (Atheris + ClusterFuzzLite) of the
-> document-processing entry points. Built on the [pygls][pygls]-based Language
+> document-processing entry points — earning the
+> [OpenSSF Best Practices **gold** badge][bestpractices-url] (100%). Built on
+> the [pygls][pygls]-based Language
 > Server with schema + IBAN/BIC diagnostics, field and message-type completion,
 > schema-description hover, code actions, document symbols, and formatting — all
 > backed by `camt053.services`. [See what's new →][release-007]
