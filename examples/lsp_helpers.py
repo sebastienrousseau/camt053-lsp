@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (C) 2023-2026 Sebastien Rousseau.
+# SPDX-License-Identifier: Apache-2.0
+
 """Example: the LSP server's editor-feature helpers.
 
 Usage:

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (C) 2023-2026 Sebastien Rousseau.
+# SPDX-License-Identifier: Apache-2.0
+
 """Example: ``compute_xml_diagnostics``.
 
 When a user opens a camt.053 XML file in their editor, the LSP also

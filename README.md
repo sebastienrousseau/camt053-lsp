@@ -421,7 +421,7 @@ Built on [pygls][pygls] and [lsprotocol][lsprotocol] by the
 [quality-url]: https://github.com/sebastienrousseau/camt053-lsp/actions/workflows/ci.yml
 [scorecard-badge]: https://api.scorecard.dev/projects/github.com/sebastienrousseau/camt053-lsp/badge?style=for-the-badge
 [scorecard-url]: https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/camt053-lsp
-[bestpractices-badge]: https://www.bestpractices.dev/projects/13375/badge
+[bestpractices-badge]: https://img.shields.io/cii/level/13375?label=OpenSSF%20Best%20Practices&style=for-the-badge
 [bestpractices-url]: https://www.bestpractices.dev/projects/13375
 [tests-badge]: https://img.shields.io/github/actions/workflow/status/sebastienrousseau/camt053-lsp/ci.yml?branch=main&label=Tests&style=for-the-badge
 [tests-url]: https://github.com/sebastienrousseau/camt053-lsp/actions/workflows/ci.yml

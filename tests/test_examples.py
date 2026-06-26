@@ -1,3 +1,6 @@
+# Copyright (C) 2023-2026 Sebastien Rousseau.
+# SPDX-License-Identifier: Apache-2.0
+
 """Exercise every shipping example end-to-end as part of CI.
 
 Each script under ``examples/`` whose name starts with two digits (the

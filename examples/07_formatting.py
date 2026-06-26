@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (C) 2023-2026 Sebastien Rousseau.
+# SPDX-License-Identifier: Apache-2.0
+
 """Example: ``format_text`` (full-document pretty-print).
 
 The LSP returns a single full-document edit that pretty-prints the

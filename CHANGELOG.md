@@ -29,6 +29,17 @@ the imported Scorecard code-scanning alerts.
   (`.clusterfuzzlite/`) with PR and scheduled batch workflows (`Fuzzing`).
 - **Hardened checkouts** with `persist-credentials: false` across workflows.
 
+### Documentation
+
+Work toward the OpenSSF Best Practices **gold** badge.
+
+- **Per-file copyright + `SPDX-License-Identifier: Apache-2.0` headers** added
+  to every source file (`copyright_per_file` / `license_per_file`).
+- **Documented code-review, test-coverage, and reproducible-build standards**
+  in `CONTRIBUTING.md` (`code_review_standards` and supporting criteria).
+- **Made the OpenSSF Best Practices badge consistent** with the other badges
+  (shields.io `for-the-badge` style).
+
 ## [0.0.6] - 2026-06-22
 
 ### Added

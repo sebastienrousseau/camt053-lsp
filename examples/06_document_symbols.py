@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (C) 2023-2026 Sebastien Rousseau.
+# SPDX-License-Identifier: Apache-2.0
+
 """Example: ``document_symbols`` (outline view).
 
 The LSP returns one symbol per reversing-entry record, with a child
