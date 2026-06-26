@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.8] - 2026-06-26
+
+### Changed
+
+- **Version** — suite-wide lockstep bump to `0.0.8`. No functional changes.
+
 ## [Unreleased]
 
 ### Added
@@ -190,6 +196,7 @@ Part of the v0.0.6 batch tracked in #16.
 - Part of the **camt053 suite** alongside the core `camt053` library and the
   `camt053-mcp` Model Context Protocol server
 
+[0.0.8]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.8
 [0.0.5]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.5
 [0.0.4]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.4
 [0.0.3]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.3
