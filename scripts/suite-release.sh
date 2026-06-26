@@ -80,6 +80,11 @@ release_one() {  # $1=repo
       say "  bump $cur -> $VERSION + open PR"
       run "git checkout -b release/v$VERSION"
       bump_versions "$d"; changelog_entry "$d" "$r"
+      # Keep poetry.lock in sync — bumping the version invalidates its
+      # content hash (poetry 2.x), which otherwise fails the release SBOM job.
+      if [ -f poetry.lock ] && command -v poetry >/dev/null; then
+        say "  refresh poetry.lock"; run "poetry lock"
+      fi
       run "git add -A"
       run "git commit -S -m 'chore(release): bump to $VERSION (suite lockstep)'"
       run "git push -u origin release/v$VERSION"
