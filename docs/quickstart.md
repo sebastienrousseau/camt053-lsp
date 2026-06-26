@@ -50,7 +50,32 @@ Use a generic LSP client extension (e.g. *LSP Sample*) and point its
 `serverOptions` at `{ command: "camt053-lsp", transport:
 TransportKind.stdio }`. Filetype: `json`.
 
-### Helix / Emacs / others
+### Helix
+
+Add to `~/.config/helix/languages.toml`:
+
+```toml
+[language-server.camt053-lsp]
+command = "camt053-lsp"
+
+[[language]]
+name = "json"
+language-servers = ["camt053-lsp"]
+```
+
+### Emacs (Eglot)
+
+Eglot ships with Emacs 29+. Register `camt053-lsp` for JSON buffers in your
+`init.el`:
+
+```elisp
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               '((json-mode json-ts-mode) . ("camt053-lsp"))))
+;; Then run M-x eglot in a JSON buffer.
+```
+
+### Other editors
 
 Anything that speaks LSP over stdio works. Configure the language
 server `command` as `camt053-lsp`, filetype `json`.
