@@ -27,9 +27,16 @@ pyproject_version() {  # $1 = repo dir
 }
 
 pypi_version() {  # $1 = package name
-  curl -fsS -m 20 "https://pypi.org/pypi/$1/json" 2>/dev/null \
-    | python3 -c 'import sys,json; print(json.load(sys.stdin)["info"]["version"])' \
-    2>/dev/null || echo "-"
+  # Fetch + parse in one Python process (no shell download-then-run pipeline).
+  python3 - "$1" <<'PY'
+import json, sys, urllib.request
+try:
+    url = "https://pypi.org/pypi/" + sys.argv[1] + "/json"
+    with urllib.request.urlopen(url, timeout=20) as resp:  # noqa: S310
+        print(json.load(resp)["info"]["version"])
+except Exception:
+    print("-")
+PY
 }
 
 gh_release() {  # $1 = repo
