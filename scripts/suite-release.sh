@@ -43,6 +43,19 @@ if [ -n "$ONLY" ]; then IFS=',' read -r -a REPOS <<< "$ONLY"; else REPOS=("${ALL
 say()  { printf '\033[1m==>\033[0m %s\n' "$*"; }
 run()  { if [ "$DO" = 1 ]; then eval "$*"; else printf '   [dry-run] %s\n' "$*"; fi; }
 
+# Block until CI checks register for a PR branch (avoids the race where
+# `gh pr checks --watch` bails with "no checks reported" immediately after a
+# PR is opened), then watch them and fail if any check fails.
+wait_ci() {  # $1 = branch
+  local b="$1" n=0
+  until [ -n "$(gh pr checks "$b" 2>/dev/null)" ]; do
+    n=$((n + 1))
+    [ "$n" -gt 30 ] && { echo "no CI checks registered for $b" >&2; return 1; }
+    sleep 10
+  done
+  gh pr checks "$b" --watch --fail-fast
+}
+
 bump_versions() {  # $1=dir
   local d="$1"
   run "perl -i -pe 's/^version = \"[^\"]*\"/version = \"$VERSION\"/m' '$d/pyproject.toml'"
@@ -96,7 +109,7 @@ release_one() {  # $1=repo
       run "git commit -S -m 'chore(release): bump to $VERSION (suite lockstep)'"
       run "git push -u origin release/v$VERSION"
       run "gh pr create --base main --head release/v$VERSION --title 'chore(release): bump to $VERSION (suite lockstep)' --body 'Suite-wide lockstep bump to $VERSION. Automated by scripts/suite-release.sh.'"
-      run "gh pr checks release/v$VERSION --watch"
+      run "wait_ci release/v$VERSION"
       run "gh pr merge release/v$VERSION --squash --delete-branch"
       run "git checkout main && git pull -q origin main"
     else
