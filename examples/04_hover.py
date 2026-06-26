@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (C) 2023-2026 Sebastien Rousseau.
+# SPDX-License-Identifier: Apache-2.0
+
 """Example: ``hover_text`` and ``hover_markup``.
 
 When the cursor lands on a field name, the LSP returns the field's

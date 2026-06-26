@@ -121,6 +121,39 @@ poetry run pytest tests/test_lsp_server.py -v
 - [ ] PR title follows conventional commit format
 - [ ] New features include tests and documentation
 
+## Code Review
+
+All changes land through pull requests and are reviewed before release:
+
+- **Every change is a pull request** against `main`; direct pushes are
+  blocked by branch protection.
+- **`main` is protected** — required status checks (tests on Python
+  3.10–3.12, lint, type-check, security scan, CodeQL) must pass, the branch
+  must be up to date, and force-pushes and deletions are disabled.
+- **A maintainer reviews each PR** before merging, checking for: tests
+  covering new behaviour, no drop in coverage, no new linter or type errors,
+  signed commits, and a conventional-commit title. Security-sensitive changes
+  additionally follow [`SECURITY.md`](SECURITY.md).
+
+See [`MAINTAINERS.md`](MAINTAINERS.md) for who can approve and merge.
+
+## Test Coverage
+
+CI enforces **100% statement and branch coverage** for `camt053_lsp`
+(`pytest --cov --cov-branch --cov-fail-under=100`) and **100% docstring
+coverage** (`interrogate`). New code must keep both at 100%. Every script
+under `examples/` is run end-to-end by `tests/test_examples.py`.
+
+## Reproducible Builds
+
+- Runtime dependencies are locked with hashes in `poetry.lock`; CI/release
+  tool installs are hash-pinned via `requirements/*.txt`
+  (`pip install --require-hashes`).
+- Distributions are built with `poetry build` from the tagged source.
+- Each release publishes **SLSA build provenance** attestations
+  (`actions/attest-build-provenance`) and CycloneDX/SPDX SBOMs, so any
+  artifact traces back to the exact workflow run and commit.
+
 ## License
 
 By contributing, you agree that your contributions will be licensed under

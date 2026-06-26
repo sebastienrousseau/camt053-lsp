@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (C) 2023-2026 Sebastien Rousseau.
+# SPDX-License-Identifier: Apache-2.0
+
 """Example: ``compute_diagnostics`` (JSON reversing-entry data files).
 
 Validates an array of reversing-entry records: schema (required fields,

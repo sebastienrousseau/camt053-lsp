@@ -1,3 +1,6 @@
+# Copyright (C) 2023-2026 Sebastien Rousseau.
+# SPDX-License-Identifier: Apache-2.0
+
 """Shared fixtures for the camt053-lsp test suite."""
 
 import pytest
