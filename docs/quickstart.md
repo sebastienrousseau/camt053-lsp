@@ -75,6 +75,27 @@ Eglot ships with Emacs 29+. Register `camt053-lsp` for JSON buffers in your
 ;; Then run M-x eglot in a JSON buffer.
 ```
 
+### Zed
+
+[Zed](https://zed.dev) attaches language servers through extensions. Once a
+small extension registers `camt053-lsp` (declaring its command as the
+`camt053-lsp` binary — see Zed's
+[language-extension docs](https://zed.dev/docs/extensions/languages)), enable it
+for JSON files in your `settings.json`:
+
+```json
+{
+  "languages": {
+    "JSON": {
+      "language_servers": ["camt053-lsp", "..."]
+    }
+  }
+}
+```
+
+The `"..."` keeps Zed's built-in JSON language server active alongside
+`camt053-lsp`.
+
 ### Other editors
 
 Anything that speaks LSP over stdio works. Configure the language
