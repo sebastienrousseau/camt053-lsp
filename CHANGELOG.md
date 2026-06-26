@@ -16,6 +16,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   package). A weekly `suite-version-check.yml` workflow guards against drift.
   See [`docs/RELEASING.md`](docs/RELEASING.md).
 
+### Security
+
+- **Keyless-signed releases** — the release workflow now signs every
+  distribution with sigstore/cosign (Fulcio + Rekor via the workflow's OIDC
+  identity) and attaches the `.sig` + `.pem` to the GitHub release, on top of
+  the existing SLSA build-provenance attestations (OpenSSF Scorecard
+  `Signed-Releases`).
+
 ## [0.0.7] - 2026-06-26
 
 ### Added
