@@ -67,6 +67,13 @@ changelog_entry() {  # $1=dir $2=repo
   fi
 }
 
+notes_file() {  # $1=dir $2=repo  (repos with a releases/ dir need vX.Y.Z.md)
+  local d="$1" r="$2"
+  [ -d "$d/releases" ] || return 0
+  [ -f "$d/releases/v$VERSION.md" ] && return 0
+  run "printf '# %s v%s\n\nSuite-wide lockstep release aligned to the camt053 suite v%s line. No functional changes in this package.\n' '$r' '$VERSION' '$VERSION' > '$d/releases/v$VERSION.md'"
+}
+
 release_one() {  # $1=repo
   local r="$1" d="$SUITE_DIR/$1"
   say "[$r]"
@@ -79,7 +86,7 @@ release_one() {  # $1=repo
     if [ "$cur" != "$VERSION" ]; then
       say "  bump $cur -> $VERSION + open PR"
       run "git checkout -b release/v$VERSION"
-      bump_versions "$d"; changelog_entry "$d" "$r"
+      bump_versions "$d"; changelog_entry "$d" "$r"; notes_file "$d" "$r"
       # Keep poetry.lock in sync — bumping the version invalidates its
       # content hash (poetry 2.x), which otherwise fails the release SBOM job.
       if [ -f poetry.lock ] && command -v poetry >/dev/null; then
