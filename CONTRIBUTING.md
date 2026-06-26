@@ -48,6 +48,16 @@ pip install poetry
 # Ensure ~/.local/bin is in PATH
 ```
 
+## Good First Issues
+
+New or casual contributors should start with issues labelled
+[`good first issue`](https://github.com/sebastienrousseau/camt053-lsp/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+— small, self-contained tasks (a focused test, a docstring, a small
+diagnostic tweak) that don't require deep knowledge of the codebase.
+[`help wanted`](https://github.com/sebastienrousseau/camt053-lsp/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)
+marks slightly larger tasks open for contribution. Comment on an issue to
+claim it before starting.
+
 ## Workflow
 
 1. **Fork** the repository
