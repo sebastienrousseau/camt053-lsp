@@ -1,0 +1,33 @@
+name: Suite version drift check
+
+# Robustness guard for the lockstep-versioned camt053 suite: verifies that every
+# sibling package is published at the same version on PyPI / GitHub Releases.
+# Fails (and notifies) if the suite drifts. Read-only — no clones, no writes.
+
+on:
+  schedule:
+    - cron: "0 7 * * 1" # weekly, Monday 07:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check suite version sync
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Check version sync across the suite
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./scripts/suite-status.sh
