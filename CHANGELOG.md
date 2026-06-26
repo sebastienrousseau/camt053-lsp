@@ -5,7 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.7] - 2026-06-25
+## [0.0.7] - 2026-06-26
+
+### Added
+
+- **CLI `--version` / `--help` flags** — `camt053-lsp --version` prints the
+  package version and `--help` prints usage; running with no arguments serves
+  LSP over stdio as before
+  ([#37](https://github.com/sebastienrousseau/camt053-lsp/issues/37)).
+- **Editor setup examples** — dedicated Helix (`languages.toml`) and
+  Emacs/Eglot (`init.el`) configuration sections in the Quickstart
+  ([#38](https://github.com/sebastienrousseau/camt053-lsp/issues/38),
+  [#39](https://github.com/sebastienrousseau/camt053-lsp/issues/39)).
+- **More `_looks_like_xml` edge-case tests** — UTF-8 BOM and empty/blank
+  input ([#40](https://github.com/sebastienrousseau/camt053-lsp/issues/40)).
 
 ### Security
 

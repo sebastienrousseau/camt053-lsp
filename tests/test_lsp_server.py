@@ -20,10 +20,13 @@ a couple of smoke checks on the module-level ``server`` object and ``main``.
 """
 
 import json
+import sys
 
 import pytest
 
 pytest.importorskip("pygls")
+
+from camt053_lsp import __version__  # noqa: E402
 
 from lsprotocol import types as lsp  # noqa: E402
 
@@ -409,8 +412,27 @@ def test_main_starts_io(monkeypatch):
         "start_io",
         lambda: calls.append(True),
     )
+    monkeypatch.setattr(sys, "argv", ["camt053-lsp"])
     lsp_server.main()
     assert calls == [True]
+
+
+def test_main_version_flag(monkeypatch, capsys):
+    """``--version`` prints the package version and exits 0."""
+    monkeypatch.setattr(sys, "argv", ["camt053-lsp", "--version"])
+    with pytest.raises(SystemExit) as exc:
+        lsp_server.main()
+    assert exc.value.code == 0
+    assert __version__ in capsys.readouterr().out
+
+
+def test_main_help_flag(monkeypatch, capsys):
+    """``--help`` prints usage and exits 0 without starting the server."""
+    monkeypatch.setattr(sys, "argv", ["camt053-lsp", "--help"])
+    with pytest.raises(SystemExit) as exc:
+        lsp_server.main()
+    assert exc.value.code == 0
+    assert "usage" in capsys.readouterr().out.lower()
 
 
 def test_validate_and_publish_directly(reversal_record):
@@ -794,6 +816,18 @@ def test_looks_like_xml_rejects_json_documents():
     """A JSON array or object is not XML."""
     assert lsp_server._looks_like_xml("[]") is False
     assert lsp_server._looks_like_xml("{}") is False
+
+
+def test_looks_like_xml_tolerates_utf8_bom():
+    """A leading UTF-8 BOM before the declaration or root element is XML."""
+    assert lsp_server._looks_like_xml("﻿<?xml version='1.0'?>") is True
+    assert lsp_server._looks_like_xml("﻿   <Document/>") is True
+
+
+def test_looks_like_xml_rejects_empty_or_blank():
+    """Empty or whitespace-only input is not XML."""
+    assert lsp_server._looks_like_xml("") is False
+    assert lsp_server._looks_like_xml("   \n\t") is False
 
 
 def test_compute_xml_diagnostics_clean_v08_yields_none():

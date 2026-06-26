@@ -70,6 +70,7 @@ glue that map those plain dicts to ``lsprotocol`` types.
 
 from __future__ import annotations
 
+import argparse
 import json
 from typing import Any
 
@@ -77,6 +78,8 @@ from camt053 import services
 from camt053.exceptions import Camt053Error
 from lsprotocol import types as lsp
 from pygls.lsp.server import LanguageServer
+
+from . import __version__
 
 DEFAULT_MESSAGE_TYPE = "camt.053.001.14"
 
@@ -797,7 +800,25 @@ def code_action(
 
 
 def main() -> None:
-    """Start the ``camt053-lsp`` language server over stdio."""
+    """Run the server over stdio, or handle ``--version`` / ``--help``.
+
+    With no arguments the ``camt053-lsp`` language server runs over stdio.
+    ``--version`` prints the package version and ``--help`` prints usage;
+    both then exit without starting the server.
+    """
+    parser = argparse.ArgumentParser(
+        prog="camt053-lsp",
+        description=(
+            "Language Server Protocol server for camt053 reversing-entry "
+            "data files. With no arguments, serves LSP over stdio."
+        ),
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"camt053-lsp {__version__}",
+    )
+    parser.parse_args()
     server.start_io()
 
 
