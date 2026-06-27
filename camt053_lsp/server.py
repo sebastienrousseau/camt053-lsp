@@ -72,6 +72,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
+import sys
 from typing import Any
 
 from camt053 import services
@@ -804,7 +806,10 @@ def main() -> None:
 
     With no arguments the ``camt053-lsp`` language server runs over stdio.
     ``--version`` prints the package version and ``--help`` prints usage;
-    both then exit without starting the server.
+    both then exit without starting the server. ``--log-level`` configures
+    Python :mod:`logging` before the server starts (default ``WARNING``).
+    Logs are written to ``stderr`` so they never corrupt the LSP stdio
+    transport, which owns ``stdout``.
     """
     parser = argparse.ArgumentParser(
         prog="camt053-lsp",
@@ -818,7 +823,23 @@ def main() -> None:
         action="version",
         version=f"camt053-lsp {__version__}",
     )
-    parser.parse_args()
+    parser.add_argument(
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        default="WARNING",
+        help="Set the logging level (default: WARNING). Logs go to stderr.",
+    )
+    args = parser.parse_args()
+    # ``force=True`` guarantees the level and the stderr stream are applied
+    # even if an imported dependency already configured the root logger
+    # (otherwise ``basicConfig`` would be a silent no-op). stderr is used
+    # because stdout is reserved for the LSP transport.
+    logging.basicConfig(
+        level=getattr(logging, args.log_level),
+        stream=sys.stderr,
+        format="%(levelname)s %(name)s %(message)s",
+        force=True,
+    )
     server.start_io()
 
 

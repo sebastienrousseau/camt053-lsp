@@ -5,22 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.8] - 2026-06-26
-
-### Changed
-
-- **Version** — suite-wide lockstep bump to `0.0.8`. No functional changes.
-
-## [Unreleased]
+## [0.0.9] - 2026-06-27
 
 ### Added
 
+- **`--log-level` CLI flag** (`{DEBUG,INFO,WARNING,ERROR}`, default
+  `WARNING`) that configures Python `logging` before the server starts.
+  Logs are written to stderr so they never corrupt the LSP stdio
+  transport; `basicConfig(force=True)` ensures the level applies even when
+  a dependency has already configured the root logger.
+  ([#45](https://github.com/sebastienrousseau/camt053-lsp/issues/45)).
 - **Cross-repo release tooling** for the lockstep-versioned suite:
   `scripts/suite-status.sh` (read-only drift check across local / tag /
   GitHub Release / PyPI) and `scripts/suite-release.sh` (safe-by-default,
   idempotent orchestrator that bumps, PRs, merges, tags, and releases every
   package). A weekly `suite-version-check.yml` workflow guards against drift.
   See [`docs/RELEASING.md`](docs/RELEASING.md).
+
+### Changed
+
+- **Version** — suite-wide lockstep bump to `0.0.9`.
 
 ### Security
 
@@ -29,6 +33,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   identity) and attaches the `.sig` + `.pem` to the GitHub release, on top of
   the existing SLSA build-provenance attestations (OpenSSF Scorecard
   `Signed-Releases`).
+
+## [0.0.8] - 2026-06-26
+
+### Changed
+
+- **Version** — suite-wide lockstep bump to `0.0.8`. No functional changes.
 
 ## [0.0.7] - 2026-06-26
 
@@ -196,6 +206,7 @@ Part of the v0.0.6 batch tracked in #16.
 - Part of the **camt053 suite** alongside the core `camt053` library and the
   `camt053-mcp` Model Context Protocol server
 
+[0.0.9]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.9
 [0.0.8]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.8
 [0.0.5]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.5
 [0.0.4]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.4

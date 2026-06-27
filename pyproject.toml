@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "camt053-lsp"
-version = "0.0.8"
+version = "0.0.9"
 description = "Language Server Protocol (LSP) server for authoring camt053 ISO 20022 camt.053 reversing-entry data files."
 authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
 license = "Apache-2.0"
