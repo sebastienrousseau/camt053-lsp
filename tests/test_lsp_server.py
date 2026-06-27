@@ -20,17 +20,17 @@ a couple of smoke checks on the module-level ``server`` object and ``main``.
 """
 
 import json
+import logging
 import sys
 
 import pytest
 
 pytest.importorskip("pygls")
 
-from camt053_lsp import __version__  # noqa: E402
-
 from lsprotocol import types as lsp  # noqa: E402
 
 import camt053_lsp.server as lsp_server  # noqa: E402
+from camt053_lsp import __version__  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -412,6 +412,8 @@ def test_main_starts_io(monkeypatch):
         "start_io",
         lambda: calls.append(True),
     )
+    # Stub ``basicConfig`` so the test never mutates global logging state.
+    monkeypatch.setattr(logging, "basicConfig", lambda **kwargs: None)
     monkeypatch.setattr(sys, "argv", ["camt053-lsp"])
     lsp_server.main()
     assert calls == [True]
@@ -434,45 +436,54 @@ def test_main_help_flag(monkeypatch, capsys):
     assert exc.value.code == 0
     assert "usage" in capsys.readouterr().out.lower()
 
+
 def test_main_log_level_default(monkeypatch):
-    """--log-level defaults to WARNING when not specified."""
-    import logging
+    """``main`` configures logging at WARNING on stderr by default."""
+    captured = {}
+    monkeypatch.setattr(sys, "argv", ["camt053-lsp"])
     monkeypatch.setattr(lsp_server.server, "start_io", lambda: None)
-    with pytest.raises(SystemExit):
+    monkeypatch.setattr(
+        logging, "basicConfig", lambda **kwargs: captured.update(kwargs)
+    )
+    lsp_server.main()
+    assert captured["level"] == logging.WARNING
+    assert captured["stream"] is sys.stderr
+    # ``force=True`` is what makes the level apply even if the root logger
+    # was already configured by an imported dependency.
+    assert captured["force"] is True
+
+
+@pytest.mark.parametrize(
+    ("name", "level"),
+    [
+        ("DEBUG", logging.DEBUG),
+        ("INFO", logging.INFO),
+        ("WARNING", logging.WARNING),
+        ("ERROR", logging.ERROR),
+    ],
+)
+def test_main_log_level_sets_level(monkeypatch, name, level):
+    """``--log-level NAME`` maps to the matching level and logs to stderr."""
+    captured = {}
+    monkeypatch.setattr(sys, "argv", ["camt053-lsp", "--log-level", name])
+    monkeypatch.setattr(lsp_server.server, "start_io", lambda: None)
+    monkeypatch.setattr(
+        logging, "basicConfig", lambda **kwargs: captured.update(kwargs)
+    )
+    lsp_server.main()
+    assert captured["level"] == level
+    assert captured["stream"] is sys.stderr
+
+
+def test_main_log_level_rejects_invalid(monkeypatch, capsys):
+    """An unknown ``--log-level`` value exits non-zero with an error."""
+    monkeypatch.setattr(sys, "argv", ["camt053-lsp", "--log-level", "TRACE"])
+    with pytest.raises(SystemExit) as exc:
         lsp_server.main()
-
-def test_main_log_level_debug(monkeypatch):
-    """--log-level DEBUG configures logging to DEBUG level."""
-    import logging
-    monkeypatch.setattr(lsp_server.server, "start_io", lambda: None)
-    monkeypatch.setattr("sys.argv", ["camt053-lsp", "--log-level", "DEBUG"])
-    root_logger = logging.getLogger()
-    monkeypatch.setattr(root_logger, "setLevel", lambda level: None)
-    calls = []
-    monkeypatch.setattr(
-        logging,
-        "basicConfig",
-        lambda **kwargs: calls.append(kwargs),
-    )
-    lsp_server.main()
-    assert any(c.get("level") == logging.DEBUG for c in calls)
+    assert exc.value.code != 0
+    assert "invalid choice" in capsys.readouterr().err.lower()
 
 
-def test_main_log_level_error(monkeypatch):
-    """--log-level ERROR configures logging to ERROR level."""
-    import logging
-    monkeypatch.setattr(lsp_server.server, "start_io", lambda: None)
-    monkeypatch.setattr("sys.argv", ["camt053-lsp", "--log-level", "ERROR"])
-    calls = []
-    monkeypatch.setattr(
-        logging,
-        "basicConfig",
-        lambda **kwargs: calls.append(kwargs),
-    )
-    lsp_server.main()
-    assert any(c.get("level") == logging.ERROR for c in calls)
-
-    
 def test_validate_and_publish_directly(reversal_record):
     """``_validate_and_publish`` pulls the document and publishes diagnostics."""
     document = _FakeDocument(json.dumps([dict(reversal_record)]))
