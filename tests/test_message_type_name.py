@@ -32,8 +32,8 @@ def test_message_type_name_returns_none_for_empty_string():
 
 
 def test_message_type_name_returns_name_for_valid_token():
-    """A supported message type returns its human-readable name."""
-    result = lsp_server.message_type_name("camt.053.001.14")
-    assert result is not None
-    assert isinstance(result, str)
-    assert len(result) > 0
+    """A supported message type returns its exact human-readable name."""
+    assert (
+        lsp_server.message_type_name("camt.053.001.14")
+        == "Bank To Customer Statement"
+    )
