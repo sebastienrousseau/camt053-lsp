@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for message_type_name() returning None for unknown tokens."""
+
 import pytest
 
 pytest.importorskip("pygls")
