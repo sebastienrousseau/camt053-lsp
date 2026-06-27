@@ -434,7 +434,45 @@ def test_main_help_flag(monkeypatch, capsys):
     assert exc.value.code == 0
     assert "usage" in capsys.readouterr().out.lower()
 
+def test_main_log_level_default(monkeypatch):
+    """--log-level defaults to WARNING when not specified."""
+    import logging
+    monkeypatch.setattr(lsp_server.server, "start_io", lambda: None)
+    with pytest.raises(SystemExit):
+        lsp_server.main()
 
+def test_main_log_level_debug(monkeypatch):
+    """--log-level DEBUG configures logging to DEBUG level."""
+    import logging
+    monkeypatch.setattr(lsp_server.server, "start_io", lambda: None)
+    monkeypatch.setattr("sys.argv", ["camt053-lsp", "--log-level", "DEBUG"])
+    root_logger = logging.getLogger()
+    monkeypatch.setattr(root_logger, "setLevel", lambda level: None)
+    calls = []
+    monkeypatch.setattr(
+        logging,
+        "basicConfig",
+        lambda **kwargs: calls.append(kwargs),
+    )
+    lsp_server.main()
+    assert any(c.get("level") == logging.DEBUG for c in calls)
+
+
+def test_main_log_level_error(monkeypatch):
+    """--log-level ERROR configures logging to ERROR level."""
+    import logging
+    monkeypatch.setattr(lsp_server.server, "start_io", lambda: None)
+    monkeypatch.setattr("sys.argv", ["camt053-lsp", "--log-level", "ERROR"])
+    calls = []
+    monkeypatch.setattr(
+        logging,
+        "basicConfig",
+        lambda **kwargs: calls.append(kwargs),
+    )
+    lsp_server.main()
+    assert any(c.get("level") == logging.ERROR for c in calls)
+
+    
 def test_validate_and_publish_directly(reversal_record):
     """``_validate_and_publish`` pulls the document and publishes diagnostics."""
     document = _FakeDocument(json.dumps([dict(reversal_record)]))

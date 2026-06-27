@@ -800,11 +800,13 @@ def code_action(
 
 
 def main() -> None:
-    """Run the server over stdio, or handle ``--version`` / ``--help``.
+    """Run the server over stdio, or handle --version / --help / --log-level.
 
     With no arguments the ``camt053-lsp`` language server runs over stdio.
     ``--version`` prints the package version and ``--help`` prints usage;
     both then exit without starting the server.
+    ``--log-level`` configures Python logging before the server starts.
+    Logs go to stderr so they never corrupt the LSP stdio transport.
     """
     parser = argparse.ArgumentParser(
         prog="camt053-lsp",
@@ -818,7 +820,20 @@ def main() -> None:
         action="version",
         version=f"camt053-lsp {__version__}",
     )
-    parser.parse_args()
+    parser.add_argument(
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        default="WARNING",
+        help="Set the logging level (default: WARNING). Logs go to stderr.",
+    )
+    args = parser.parse_args()
+    import logging
+    import sys
+    logging.basicConfig(
+        level=getattr(logging, args.log_level),
+        stream=sys.stderr,
+        format="%(levelname)s %(name)s %(message)s",
+    )
     server.start_io()
 
 
