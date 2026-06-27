@@ -7,18 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.9] - 2026-06-27
 
-### Changed
-
-- **Version** — suite-wide lockstep bump to `0.0.9`. No functional changes.
-
-## [0.0.8] - 2026-06-26
-
-### Changed
-
-- **Version** — suite-wide lockstep bump to `0.0.8`. No functional changes.
-
-## [Unreleased]
-
 ### Added
 
 - **`--log-level` CLI flag** (`{DEBUG,INFO,WARNING,ERROR}`, default
@@ -34,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   package). A weekly `suite-version-check.yml` workflow guards against drift.
   See [`docs/RELEASING.md`](docs/RELEASING.md).
 
+### Changed
+
+- **Version** — suite-wide lockstep bump to `0.0.9`.
+
 ### Security
 
 - **Keyless-signed releases** — the release workflow now signs every
@@ -41,6 +33,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   identity) and attaches the `.sig` + `.pem` to the GitHub release, on top of
   the existing SLSA build-provenance attestations (OpenSSF Scorecard
   `Signed-Releases`).
+
+## [0.0.8] - 2026-06-26
+
+### Changed
+
+- **Version** — suite-wide lockstep bump to `0.0.8`. No functional changes.
 
 ## [0.0.7] - 2026-06-26
 
