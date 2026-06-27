@@ -135,6 +135,21 @@ editor's LSP client, not used interactively. Point your editor at it for JSON
 reversing-entry data files and you get diagnostics, completion, and hover as you
 type.
 
+### Command-line options
+
+| Flag | Description |
+| --- | --- |
+| `--version` | Print the package version and exit. |
+| `--help` | Print usage and exit. |
+| `--log-level {DEBUG,INFO,WARNING,ERROR}` | Set the logging verbosity (default: `WARNING`). |
+
+Logs are written to **stderr** so they never corrupt the LSP transport, which
+owns stdout. Raise the level when diagnosing editor-integration issues:
+
+```sh
+camt053-lsp --log-level DEBUG
+```
+
 ### Editor wiring
 
 Register `camt053-lsp` as the server `cmd` for JSON files in your editor's LSP

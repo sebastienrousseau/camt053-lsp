@@ -21,6 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`--log-level` CLI flag** (`{DEBUG,INFO,WARNING,ERROR}`, default
+  `WARNING`) that configures Python `logging` before the server starts.
+  Logs are written to stderr so they never corrupt the LSP stdio
+  transport; `basicConfig(force=True)` ensures the level applies even when
+  a dependency has already configured the root logger.
+  ([#45](https://github.com/sebastienrousseau/camt053-lsp/issues/45)).
 - **Cross-repo release tooling** for the lockstep-versioned suite:
   `scripts/suite-status.sh` (read-only drift check across local / tag /
   GitHub Release / PyPI) and `scripts/suite-release.sh` (safe-by-default,
