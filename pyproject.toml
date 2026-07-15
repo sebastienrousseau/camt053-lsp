@@ -70,6 +70,13 @@ addopts = [
     "--cov-fail-under=100",
     "-ra",
     "--strict-markers",
+    # Load/stress tests are opt-in: run them with ``pytest -m perf --no-cov``
+    # (mirrors the sibling camt053 repo's perf-marker convention).
+    "-m",
+    "not perf",
+]
+markers = [
+    "perf: load/stress tests, excluded from the default gate (run with -m perf --no-cov)",
 ]
 
 [tool.coverage.run]
