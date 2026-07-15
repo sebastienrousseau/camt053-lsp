@@ -627,7 +627,7 @@ def format_text(text: str) -> str | None:
 # ---------------------------------------------------------------------------
 # LSP glue (thin - maps plain dicts to lsprotocol types)
 # ---------------------------------------------------------------------------
-server = LanguageServer("camt053-lsp", "v0.0.5")
+server = LanguageServer("camt053-lsp", f"v{__version__}")
 
 _SEVERITY = {
     "error": lsp.DiagnosticSeverity.Error,
