@@ -17,15 +17,15 @@
 completion, and hover as you author the JSON records that drive `camt.053`
 reversal generation.
 
-> **Latest release: v0.0.7** — supply-chain hardening: every GitHub Action
-> SHA-pinned, all CI/release `pip` installs hash-pinned, least-privilege
-> workflow tokens, and continuous fuzzing (Atheris + ClusterFuzzLite) of the
-> document-processing entry points — earning the
-> [OpenSSF Best Practices **gold** badge][bestpractices-url] (100%). Built on
-> the [pygls][pygls]-based Language
+> **Latest release: v0.0.13** — suite-wide version alignment, all open
+> dependency bumps folded in (camt053 0.0.9, SHA-pinned actions, fuzzing base
+> image), and an opt-in concurrent load/stress suite covering the diagnostics,
+> completion, and hover hot paths. Retains the supply-chain hardening that
+> earned the [OpenSSF Best Practices **gold** badge][bestpractices-url]
+> (100%). Built on the [pygls][pygls]-based Language
 > Server with schema + IBAN/BIC diagnostics, field and message-type completion,
 > schema-description hover, code actions, document symbols, and formatting — all
-> backed by `camt053.services`. [See what's new →][release-007]
+> backed by `camt053.services`. [See what's new →][release-0013]
 
 ## Contents
 
@@ -428,7 +428,7 @@ Built on [pygls][pygls] and [lsprotocol][lsprotocol] by the
 [lsp]: https://microsoft.github.io/language-server-protocol/
 [lsprotocol]: https://github.com/microsoft/lsprotocol
 [pygls]: https://github.com/openlawlibrary/pygls
-[release-007]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.7
+[release-0013]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.13
 [docs-badge]: https://img.shields.io/badge/Docs-camt053.com-blue?style=for-the-badge
 [docs-url]: https://sebastienrousseau.github.io/camt053/
 [license-badge]: https://img.shields.io/pypi/l/camt053-lsp?style=for-the-badge

@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.13] - 2026-07-16
+
+### Added
+
+- **Load/stress test suite** (`tests/test_stress.py`) that hammers the
+  server's hot paths — document open/change diagnostics, completion, and
+  hover — with sustained concurrent requests (8 workers x 400 iterations
+  per path), asserting zero errors, bounded p95 latency, and bounded
+  memory growth (`tracemalloc`). Marked `perf` and excluded from the
+  default gate; run with `pytest -m perf --no-cov`.
+
+### Changed
+
+- **Version** — suite-wide lockstep alignment to `0.0.13` (versions
+  `0.0.10`–`0.0.12` were skipped in this repo to realign with the rest of
+  the camt053 suite).
+- **Server version string** — the version announced to LSP clients now
+  derives from `__version__` instead of a stale hardcoded `"v0.0.5"`.
+- **Dependencies** — folded all open Dependabot bumps: `camt053`
+  0.0.6 → 0.0.9, `ruff` 0.15.20 → 0.15.21 and `mypy` allowed up to `<3.0`
+  in the lint pins, `github/codeql-action` and
+  `actions/attest-build-provenance` SHA bumps, and the ClusterFuzzLite
+  `base-builder-python` image digest refresh.
+
 ## [0.0.9] - 2026-06-27
 
 ### Added
@@ -206,6 +230,7 @@ Part of the v0.0.6 batch tracked in #16.
 - Part of the **camt053 suite** alongside the core `camt053` library and the
   `camt053-mcp` Model Context Protocol server
 
+[0.0.13]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.13
 [0.0.9]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.9
 [0.0.8]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.8
 [0.0.5]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.5
