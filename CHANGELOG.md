@@ -5,7 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.0.14] - 2026-07-16
+
+### Changed
+
+- **Version** — suite-wide lockstep bump to `0.0.14`, keeping the ISO
+  20022 camt053 suite packages on the same version as the core
+  `camt053` 0.0.14 release.
+- **Dependencies** — `camt053` 0.0.13 → 0.0.14 in `poetry.lock` and the
+  hash-pinned `requirements/{fuzz,lint,test}.txt` CI pins (camt053
+  only; no other pins move).
 
 ### Security
 
@@ -241,6 +250,7 @@ Part of the v0.0.6 batch tracked in #16.
 - Part of the **camt053 suite** alongside the core `camt053` library and the
   `camt053-mcp` Model Context Protocol server
 
+[0.0.14]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.14
 [0.0.13]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.13
 [0.0.9]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.9
 [0.0.8]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.8
