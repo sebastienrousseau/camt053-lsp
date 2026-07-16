@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Security
+
+- **click 8.1.7 → 8.4.2** (PYSEC-2026-2132 / CVE-2026-7246) — bumped the
+  transitive `click` pin past the vulnerable range (fixed in >=8.3.3) by
+  updating `camt053` 0.0.9 → 0.0.13 in `poetry.lock` and regenerating the
+  hash-pinned `requirements/{fuzz,lint,test}.txt` (also picks up
+  `markupsafe` 2.1.5 → 3.0.3 as a transitive update). Resolves OpenSSF
+  Scorecard Vulnerabilities alert #57.
+
 ## [0.0.13] - 2026-07-16
 
 ### Added
