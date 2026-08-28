@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.17] - 2026-08-28
+
+Suite release with `camt053` 0.0.17, which moves to **xmlschema 4**. No
+functional change in this package.
+
+### Changed
+
+- **The `camt053` floor moves to `>=0.0.17`.** 0.0.17 is the first
+  release built against `xmlschema >=4.3.2`. A resolver left free to
+  pick 0.0.16 would install xmlschema 3 alongside packages that now
+  need 4, and the conflict surfaces at import rather than at install.
+
 ## [0.0.16] - 2026-08-21
 
 Suite release with `camt053` 0.0.16. No functional change in this
