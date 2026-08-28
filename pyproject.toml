@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "camt053-lsp"
-version = "0.0.17"
+version = "0.0.18"
 description = "Language Server Protocol (LSP) server for authoring camt053 ISO 20022 camt.053 reversing-entry data files."
 authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
 license = "Apache-2.0 OR MIT"
@@ -27,6 +27,12 @@ ruff = ">=0.1,<0.17"
 mypy = ">=1.11,<3.0"
 bandit = "^1.7.0"
 interrogate = "^1.7"
+# tests/test_suite_conformance.py parses pyproject.toml. tomllib is
+# stdlib only from 3.11 and the suite floor is 3.10, so without the
+# backport the conformance gate does not run there at all.
+tomli = { version = ">=2", python = "<3.11" }
+packaging = ">=23"
+
 
 [tool.interrogate]
 fail-under = 100
@@ -38,7 +44,13 @@ verbose = 1
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+# tests/test_suite_conformance.py is generated and vendored from one
+# canonical copy shared across the suite, and checksummed by its own
+# test. The suite uses three different line lengths, so letting each
+# repository's formatter rewrite it would make the checksum
+# unsatisfiable everywhere. Excluded as any generated file would be.
 [tool.black]
+extend-exclude = "tests/test_suite_conformance\\.py"
 line-length = 79
 target-version = ['py310']
 
