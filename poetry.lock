@@ -180,14 +180,14 @@ uvloop = ["uvloop (>=0.15.2) ; sys_platform != \"win32\"", "winloop (>=0.5.0) ; 
 
 [[package]]
 name = "camt053"
-version = "0.0.16"
+version = "0.0.17"
 description = "Camt053 is a Python library for reading ISO 20022 camt Bank-to-Customer Statements (camt.053/052/054) and generating validated reversing entries by return reason code (e.g. AC04 Closed Account)."
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "camt053-0.0.16-py3-none-any.whl", hash = "sha256:7d89001da6a4a173ae101a3fab1b4eeeda7027421d05d55748556e170ebd8c75"},
-    {file = "camt053-0.0.16.tar.gz", hash = "sha256:1e6ce92c71cd7a43721f608d39d405035db0958edb68c78c4f500ee7a9bf59d2"},
+    {file = "camt053-0.0.17-py3-none-any.whl", hash = "sha256:805a24ac3266f4414e7b590e84f16eb1fb0d5d3ac81c08556d54c0cd27780dc5"},
+    {file = "camt053-0.0.17.tar.gz", hash = "sha256:e559fb39961a36c7555526ae93dd4829fa8809933d02e6416282a9deeb0895ee"},
 ]
 
 [package.dependencies]
@@ -203,7 +203,7 @@ markupsafe = ">=2.1,<4"
 pygments = ">=2.20.0,<3.0.0"
 rich = ">=13.7.1,<16"
 uvicorn = {version = ">=0.20", extras = ["standard"]}
-xmlschema = ">=3.4.0,<4.0.0"
+xmlschema = ">=4.3.2,<5.0.0"
 
 [package.extras]
 fast = ["lxml (>=5.0,<7)"]
@@ -558,18 +558,19 @@ files = [
 
 [[package]]
 name = "elementpath"
-version = "4.8.0"
+version = "5.1.4"
 description = "XPath 1.0/2.0/3.0/3.1 parsers and selectors for ElementTree and lxml"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "elementpath-4.8.0-py3-none-any.whl", hash = "sha256:5393191f84969bcf8033b05ec4593ef940e58622ea13cefe60ecefbbf09d58d9"},
-    {file = "elementpath-4.8.0.tar.gz", hash = "sha256:5822a2560d99e2633d95f78694c7ff9646adaa187db520da200a8e9479dc46ae"},
+    {file = "elementpath-5.1.4-py3-none-any.whl", hash = "sha256:5ec8d7bb44b16c98414a6a95e20cb150f3cbfc3cac65edc14773288c7a937376"},
+    {file = "elementpath-5.1.4.tar.gz", hash = "sha256:3c912a9c41311ac5244c038867670d7c0b0fec0e444813608e5b846dbb3428ac"},
 ]
 
 [package.extras]
-dev = ["Sphinx", "coverage", "flake8", "lxml", "lxml-stubs", "memory-profiler", "memray", "mypy", "tox", "xmlschema (>=3.3.2)"]
+dev = ["coverage", "flake8", "lxml", "lxml-stubs", "memray ; platform_python_implementation != \"PyPy\"", "mypy", "psutil", "sphinx", "tox (>=4.0)", "xmlschema (>=4.0.1)"]
+docs = ["readthedocs-sphinx-search", "sphinx"]
 
 [[package]]
 name = "exceptiongroup"
@@ -2396,25 +2397,25 @@ files = [
 
 [[package]]
 name = "xmlschema"
-version = "3.4.5"
+version = "4.3.2"
 description = "An XML Schema validator and decoder"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "xmlschema-3.4.5-py3-none-any.whl", hash = "sha256:c91a2fca387dc4e8a2f2cb4a411ed23bef9da539968e5d858a3fe7f76a65464e"},
-    {file = "xmlschema-3.4.5.tar.gz", hash = "sha256:243244743f151ec859ec0bbf1368fa3f70e5f29e977b77f72e1c9b8f8ae670f6"},
+    {file = "xmlschema-4.3.2-py3-none-any.whl", hash = "sha256:cf5c970a30f6ebcb3da35260e694704cc0b6794d8ace46125bb2a95e38ed9307"},
+    {file = "xmlschema-4.3.2.tar.gz", hash = "sha256:f3b33a21a2b2cdc404ddc3fb599d8bc1dee90b155d547370672e6e684746b8d6"},
 ]
 
 [package.dependencies]
-elementpath = ">=4.4.0,<5.0.0"
+elementpath = ">=5.1.3,<6.0.0"
 
 [package.extras]
 codegen = ["jinja2"]
-dev = ["coverage", "flake8", "lxml", "lxml-stubs", "memory_profiler", "mypy", "tox", "xmlschema[docs]"]
+dev = ["coverage", "flake8", "lxml", "lxml-stubs", "mypy", "psutil", "tox", "xmlschema[docs]"]
 docs = ["jinja2", "sphinx", "sphinx_rtd_theme"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "76ae1630fed1451393c11a1d6cb6cc3acb729225cce2549e6f0d6f06fac81571"
+content-hash = "4506b999fd5e988b6cdd466c5b13b053f55a23e50ae85e0e720c4d58a6e5a0cf"
