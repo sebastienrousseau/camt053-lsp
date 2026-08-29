@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "camt053-lsp"
-version = "0.0.18"
+version = "0.0.20"
 description = "Language Server Protocol (LSP) server for authoring camt053 ISO 20022 camt.053 reversing-entry data files."
 authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
 license = "Apache-2.0 OR MIT"
@@ -63,6 +63,10 @@ select = ["E", "W", "F", "I", "B", "C4", "UP"]
 ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
+# A standalone benchmark has to put the repository on sys.path
+# before importing the package it measures, so its imports cannot
+# come first.
+"benches/*.py" = ["E402"]
 "__init__.py" = ["F401"]
 
 [tool.ruff.format]
