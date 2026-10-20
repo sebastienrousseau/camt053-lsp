@@ -1,7 +1,8 @@
-.PHONY: help install dev test lint format type-check security complexity fuzz pip-compile clean examples check
+.PHONY: help install dev test lint format type-check security complexity fuzz pip-compile clean examples demo check
 
 PYTHON ?= python3
 POETRY ?= poetry
+VHS ?= vhs
 
 help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
@@ -51,6 +52,9 @@ clean: ## Remove build artifacts and caches
 	rm -rf coverage.xml .coverage
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name '*.pyc' -delete 2>/dev/null || true
+
+demo: ## Render .github/demo.gif from .github/demo.tape with VHS
+	$(POETRY) run $(VHS) .github/demo.tape
 
 examples: ## Verify example scripts run
 	$(POETRY) run python examples/lsp_helpers.py
