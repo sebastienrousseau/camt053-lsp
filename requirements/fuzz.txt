@@ -24,9 +24,9 @@ attrs==26.1.0 \
     #   lsprotocol
     #   pygls
     #   referencing
-camt053==0.0.15 \
-    --hash=sha256:54ab4a34bb54b74b7e4c56cacb336eafdbbc19dfc0d958c6b4bfb8f62537ab69 \
-    --hash=sha256:8e77bd97d49d014a3bab74c8ac6dd7a0ec72f367a5f91777bac60e068bffd9c0
+camt053==0.0.20 \
+    --hash=sha256:1f3bf89f3b69184d78d331a354b9537a38f2237a4daa52c520fa6ab57f16dc78 \
+    --hash=sha256:22e89754463d00373a50efd24123e77ccc34ff1ebd9e9608902ee133f66ca9ec
     # via -r requirements/fuzz.in
 cattrs==26.1.0 \
     --hash=sha256:d1e0804c42639494d469d08d4f26d6b9de9b8ab26b446db7b5f8c2e97f7c3096 \
@@ -206,9 +206,9 @@ defusedxml==0.7.1 \
     --hash=sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69 \
     --hash=sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61
     # via camt053
-elementpath==4.8.0 \
-    --hash=sha256:5393191f84969bcf8033b05ec4593ef940e58622ea13cefe60ecefbbf09d58d9 \
-    --hash=sha256:5822a2560d99e2633d95f78694c7ff9646adaa187db520da200a8e9479dc46ae
+elementpath==5.1.4 \
+    --hash=sha256:3c912a9c41311ac5244c038867670d7c0b0fec0e444813608e5b846dbb3428ac \
+    --hash=sha256:5ec8d7bb44b16c98414a6a95e20cb150f3cbfc3cac65edc14773288c7a937376
     # via xmlschema
 exceptiongroup==1.3.1 ; python_full_version < '3.11' \
     --hash=sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219 \
@@ -1395,7 +1395,7 @@ websockets==17.0.1 ; python_full_version >= '3.11' \
     --hash=sha256:ffad64ce7ad3703d652a3fd9af26238377d24ce52c6ad8ff35d26d82f61f493f \
     --hash=sha256:ffad64ce7ad3703d652a3fd9af26238377d24ce52c6ad8ff35d26d82f61f493f
     # via uvicorn
-xmlschema==3.4.5 \
-    --hash=sha256:243244743f151ec859ec0bbf1368fa3f70e5f29e977b77f72e1c9b8f8ae670f6 \
-    --hash=sha256:c91a2fca387dc4e8a2f2cb4a411ed23bef9da539968e5d858a3fe7f76a65464e
+xmlschema==4.3.2 \
+    --hash=sha256:cf5c970a30f6ebcb3da35260e694704cc0b6794d8ace46125bb2a95e38ed9307 \
+    --hash=sha256:f3b33a21a2b2cdc404ddc3fb599d8bc1dee90b155d547370672e6e684746b8d6
     # via camt053
