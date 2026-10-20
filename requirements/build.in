@@ -1,3 +1,9 @@
 # Build/publish tooling for the release "publish" + "sbom" jobs.
 poetry
 twine
+# Transitive through poetry and twine; constrained so no advised version
+# resolves. urllib3: GHSA-vxq7-64xx-v4gw, GHSA-8988-9cw3-xx77,
+# GHSA-gh4c-6fx4-qh6g. virtualenv: GHSA-9h9j-4vrj-gf7g,
+# GHSA-94p9-xgh2-xp45, GHSA-x78j-v8h9-3j2q, GHSA-p58f-9548-mpm2.
+urllib3>=2.8.0
+virtualenv>=21.7.13
