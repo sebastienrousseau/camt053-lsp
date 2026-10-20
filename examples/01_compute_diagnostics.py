@@ -20,7 +20,9 @@ from camt053_lsp.server import compute_diagnostics
 
 
 def main() -> None:
-    valid_doc = (Path(__file__).parent / "_data" / "sample_records.json").read_text()
+    valid_doc = (
+        Path(__file__).parent / "_data" / "sample_records.json"
+    ).read_text()
     print(f"valid       : {len(compute_diagnostics(valid_doc))} diagnostic(s)")
 
     missing = json.dumps([{"statement_msg_id": "ONLY-ID"}])
@@ -28,10 +30,12 @@ def main() -> None:
 
     bad_bic = json.dumps([{"account_servicer_bic": "INVALID"}])
     print(f"bad-bic     : {len(compute_diagnostics(bad_bic))} diagnostic(s)")
-    if (d := compute_diagnostics(bad_bic)):
+    if d := compute_diagnostics(bad_bic):
         print(f"              first: {d[0].get('message')}")
 
-    print(f"malformed   : {len(compute_diagnostics('{not json'))} diagnostic(s)")
+    print(
+        f"malformed   : {len(compute_diagnostics('{not json'))} diagnostic(s)"
+    )
 
 
 if __name__ == "__main__":

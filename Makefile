@@ -18,12 +18,12 @@ test: ## Run tests
 	$(POETRY) run pytest tests/ -v
 
 lint: ## Run linters (ruff + black check)
-	$(POETRY) run ruff check camt053_lsp/ tests/
-	$(POETRY) run black --check camt053_lsp/ tests/
+	$(POETRY) run ruff check camt053_lsp/ tests/ benches/ scripts/ fuzz/ examples/
+	$(POETRY) run black --check camt053_lsp/ tests/ benches/ scripts/ fuzz/ examples/
 
 format: ## Auto-format code (ruff fix + black)
-	$(POETRY) run ruff check --fix camt053_lsp/ tests/
-	$(POETRY) run black camt053_lsp/ tests/
+	$(POETRY) run ruff check --fix camt053_lsp/ tests/ benches/ scripts/ fuzz/ examples/
+	$(POETRY) run black camt053_lsp/ tests/ benches/ scripts/ fuzz/ examples/
 
 type-check: ## Run mypy type checking
 	$(POETRY) run mypy camt053_lsp/
