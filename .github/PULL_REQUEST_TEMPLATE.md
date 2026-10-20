@@ -1,36 +1,51 @@
 <!--
-Thank you for contributing to camt053-lsp! Please complete the checklist below.
-Use a Conventional Commit style title, e.g. "feat: add hover for reason codes".
+Pull request description for camt053-lsp. The shape follows the shared
+PR template (section order, Highlights, fenced Checksums block, Full
+Changelog line), aligned with the release page format at
+https://github.com/sebastienrousseau/passmcp/releases/tag/v0.0.5.
+
+- Title: a Conventional Commit, e.g. "fix: keep hover on escaped keys".
+- Open with a two-line BLUF: line 1 begins "This PR " and says what it
+  does; line 2 says why it matters or the outcome. Put a blank line
+  between them, and no paragraph above.
+- Write like a person: direct, concrete, no filler. No em dash
+  characters anywhere; use commas, colons, parentheses or a spaced
+  hyphen. No tool-attribution footer.
+- Keep the sections and their order. Fill every placeholder from real
+  evidence: commands that ran and what they printed.
+- Every commit is signed and carries a Signed-off-by from its author.
 -->
 
-## Summary
+This PR <what it does, in one plain line>.
 
-Briefly describe what this PR changes and why.
+<why it matters or the outcome, in one plain line>
 
-## Linked Issue
+## Highlights ⭐️
 
-Closes #<!-- issue number -->
+* **<Headline>**: <one or two plain sentences on what changed for the user>.
+* **<Headline>**: <one or two plain sentences>.
 
-## Type of Change
+## What's Changed
 
-- [ ] Bug fix (`fix:`)
-- [ ] New feature (`feat:`)
-- [ ] Documentation (`docs:`)
-- [ ] Refactor / chore (no behaviour change)
+* `<commit subject>` by @<author>
 
-## Checklist
+<optional: a few detail bullets naming files and the concrete change>
 
-- [ ] PR title follows [Conventional Commits](https://www.conventionalcommits.org/)
-- [ ] Linked to a tracking issue
-- [ ] All commits are signed (SSH or GPG)
-- [ ] Tests added or updated for the change
-- [ ] `pytest tests/` passes with **100% coverage**
-- [ ] `ruff check camt053_lsp/` passes
-- [ ] `black --check camt053_lsp/ tests/` passes
-- [ ] `mypy camt053_lsp/` passes (strict)
-- [ ] Documentation updated (README / CHANGELOG / docstrings) where relevant
-- [ ] CHANGELOG.md updated under the `Unreleased` section
+## Validation
 
-## Additional Notes
+* `python -m pytest`: <N passed, coverage 100% line and branch>.
+* `ruff check camt053_lsp/ tests/ benches/` and `black --check camt053_lsp/ tests/ benches/`: <result>.
+* `mypy camt053_lsp/`: <result>.
+* `python scripts/check_complexity.py` and `python scripts/verify_versions.py`: <result>.
+* `poetry build` and `twine check dist/*`: <result>.
 
-Anything reviewers should pay particular attention to.
+## Checksums
+
+SHA-256 of the artifacts produced by `poetry build` on this branch:
+
+```text
+<sha256>  dist/camt053_lsp-<version>-py3-none-any.whl
+<sha256>  dist/camt053_lsp-<version>.tar.gz
+```
+
+**Full Changelog**: https://github.com/sebastienrousseau/camt053-lsp/compare/<base>...<head>

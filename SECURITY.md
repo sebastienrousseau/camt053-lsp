@@ -86,17 +86,17 @@ the concrete control(s) that implement it in this repo.
 | :--- | :--- |
 | **PO.1** Define security requirements | This `SECURITY.md`, plus the in-scope/out-of-scope sections above. |
 | **PO.3** Implement supporting toolchains | `pyproject.toml`; `.github/workflows/ci.yml` (test + lint + security scan); `.github/workflows/scorecard.yml`. |
-| **PO.4** Define and use criteria for software security checks | CI enforces tests on Python 3.10/3.11/3.12, ruff lint, black formatting, mypy, bandit security scan, interrogate docstring coverage; Scorecard runs weekly. |
+| **PO.4** Define and use criteria for software security checks | CI enforces tests on Python 3.10 to 3.14, ruff lint, black formatting, mypy, bandit security scan, interrogate docstring coverage, per-function complexity ceilings and version-source agreement; Scorecard runs weekly. |
 | **PO.5** Implement and maintain secure environments | PyPI Trusted Publishing (OIDC, no long-lived tokens); branch protection + signed commits on `main`; per-workflow `permissions:` minimisation. |
-| **PS.1** Protect all forms of code from unauthorized access and tampering | Signed commits (SSH ed25519); branch protection; required PR reviews; `persist-credentials: false` on Scorecard checkout. |
+| **PS.1** Protect all forms of code from unauthorized access and tampering | Signed commits (SSH ed25519); branch protection on `main` (signed commits, linear history, required status checks, enforced for admins); `persist-credentials: false` on every checkout. |
 | **PS.2** Provide a mechanism for verifying software release integrity | Signed git tags; `actions/attest-build-provenance@v3` SLSA L3 provenance attestations; PEP 740 sigstore attestations on PyPI uploads (`pypa/gh-action-pypi-publish` with `attestations: true`). |
 | **PS.3** Archive and protect each software release | GitHub Releases pin the exact `dist/*` artifacts; CycloneDX 1.6 + SPDX 2.3 SBOMs and a pip-licenses manifest attached to every release; PyPI is the immutable archive. |
 | **PW.1** Design software to mitigate security risks | LSP processes only the local document text supplied by the editor over stdio; never opens network sockets; never executes user content. JSON inputs go through `json.loads` only (no `eval` / no dynamic import). |
 | **PW.4** Reuse well-secured software when feasible | Dependencies pinned via pyproject; Dependabot grouped weekly + separate security-update group; updates reviewed before merge. |
 | **PW.5** Adhere to secure coding practices | `ruff`, `bandit -ll`, strict `mypy`, code review on every PR. |
 | **PW.6** Configure build processes to improve security | Reproducible builds via `python -m build` / `poetry build` with locked dependencies; CI uses pinned action versions; minimum-required GH Actions permissions. |
-| **PW.7** Review and analyze human-readable code | All changes go through PRs with required review; ruff + mypy + bandit on every change. |
-| **PW.8** Test executable code | pytest across 3 Python versions; per-capability runnable examples auto-exercised in CI via `tests/test_examples.py`. |
+| **PW.7** Review and analyze human-readable code | All changes go through PRs; CodeQL static analysis runs on push/PR; ruff + mypy + bandit on every change. With one maintainer there is no second reviewer (see Code-Review below). |
+| **PW.8** Test executable code | pytest across Python 3.10 to 3.14; per-capability runnable examples auto-exercised in CI via `tests/test_examples.py`. |
 | **PW.9** Configure software with secure defaults | Stdio transport binds to the local process owner only (no network listener); JSONC tolerance is purely syntactic (strips `//` line comments and trailing commas — no JSONC-specific code execution). |
 | **RV.1** Identify and confirm vulnerabilities on an ongoing basis | Dependabot daily; `bandit` in CI; OpenSSF Scorecard weekly; GitHub Security Advisories accept reports. |
 | **RV.2** Assess, prioritise, and remediate vulnerabilities | Coordinated-disclosure timeline above (3-day ack / 7-day assessment / 30-day fix); CHANGELOG + advisory at fix publication. |
@@ -112,13 +112,13 @@ treats its results as advisory. The checks below are **accepted risks**: they
 cannot be resolved by code or configuration for a single-maintainer
 open-source project, and are recorded here so their status is explicit.
 
-- **Branch-Protection** — `main` is protected: pull requests are required,
-  with a required status check (`Lint & Type Check`), dismissal of stale
-  reviews, linear history, and no force-pushes or deletions. Scorecard's
-  highest tier also wants `enforce_admins` enabled; we deliberately leave it
-  **off** so the sole maintainer can still merge approved release/security
-  PRs without a second account (see [`MAINTAINERS.md`](MAINTAINERS.md)). This
-  is an accepted trade-off.
+- **Branch-Protection** — `main` is protected: required status checks
+  (`Analyze (Python) (python)`, `Lint & Type Check`, `Security Scan`),
+  signed commits, linear history, resolved conversations, no force-pushes
+  or deletions, all enforced for admins. Scorecard's higher tiers also want
+  required approving reviews, which a single maintainer cannot give to their
+  own pull requests (see [`MAINTAINERS.md`](MAINTAINERS.md)). This is an
+  accepted trade-off.
 - **Code-Review** — Scorecard expects each change to be approved by a
   *second* reviewer. With a single maintainer this is structurally
   impossible; changes still go through pull requests with CI gating.
