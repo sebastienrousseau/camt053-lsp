@@ -9,6 +9,10 @@ must appear in the package's ``__version__``, as a ``## [X.Y.Z]`` heading in
 ``Latest release: vX.Y.Z`` callout, and as the supported row of the
 ``SECURITY.md`` version table.
 
+The camt053 suite releases together at one version, core first, so the
+core floor this server declares (``pyproject.toml`` and every
+``requirements/*.in`` that names it) must be ``>=`` this version too.
+
 The README and SECURITY.md had sat six releases behind the package
 (v0.0.14 against 0.0.20) with nothing to notice. Standard library only,
 so the workflow needs no install.
@@ -105,12 +109,52 @@ def _check_security(expected: str) -> Check:
     return [line], [] if ok else [problem]
 
 
+#: The suite members this server depends on, released before it.
+FAMILY = ("camt053",)
+
+_FLOOR = re.compile(
+    r'^"?(' + "|".join(re.escape(n) for n in FAMILY) + r')"?\s*=?\s*"?'
+    r"\s*>=\s*([0-9][0-9.]*)",
+    re.MULTILINE,
+)
+
+
+def _floors(text: str) -> list[tuple[str, str]]:
+    """Every ``(member, floor)`` declared in ``text``."""
+    return [(m.group(1), m.group(2)) for m in _FLOOR.finditer(text)]
+
+
+def _check_family(expected: str) -> Check:
+    sources = [
+        ROOT / "pyproject.toml",
+        *sorted(ROOT.glob("requirements/*.in")),
+    ]
+    found = {
+        path: _floors(path.read_text(encoding="utf-8")) for path in sources
+    }
+    problems = [
+        f"{path.relative_to(ROOT)}: {name}>={floor}, the suite is at {expected}"
+        for path, floors in found.items()
+        for name, floor in floors
+        if floor != expected
+    ]
+    declared = {name for name, _ in found[sources[0]]}
+    problems += [
+        f"pyproject.toml declares no {name} floor"
+        for name in FAMILY
+        if name not in declared
+    ]
+    lines = [f"  suite floors           = {len(problems)} not at {expected}"]
+    return lines, problems
+
+
 CHECKS = (
     _check_package,
     _check_changelog,
     _check_citation,
     _check_readme,
     _check_security,
+    _check_family,
 )
 
 

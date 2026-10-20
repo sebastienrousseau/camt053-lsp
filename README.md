@@ -68,7 +68,7 @@ python -m pip install camt053-lsp
 ```
 
 > **Latest release: v0.0.23**: JSONC stripping in linear time (a 1.2 MB
-> document took 3.2 s per change), the camt053 0.0.20 floor, anyio
+> document took 3.2 s per change), the camt053 0.0.23 floor, anyio
 > 4.14.2 or newer, and complexity, version and dependency-audit gates in
 > CI. Schema and IBAN/BIC diagnostics, completion, hover, code actions,
 > document symbols and formatting, all backed by `camt053.services`.
@@ -96,7 +96,7 @@ camt053-lsp --version
 - Python 3.10 or newer, tested in CI on 3.10, 3.11, 3.12, 3.13 and 3.14 on
   Linux ([toolchain policy](docs/POLICIES.md)). The package is pure Python
   and runs wherever its dependencies do: macOS, Linux and Windows.
-- `camt053` 0.0.20 or newer (below 1.0) and `pygls` 1.3 or newer, installed
+- `camt053` 0.0.23 or newer (below 1.0) and `pygls` 1.3 or newer, installed
   automatically.
 - `anyio` 4.14.2 or newer: earlier releases are affected by
   GHSA-3w57-8xmc-8v26, GHSA-5p39-cfhj-2xmp and GHSA-82r6-8w77-94w6 and cannot

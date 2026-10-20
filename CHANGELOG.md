@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.23] - 2026-10-20
 
 The camt053 suite's 0.0.23 release, core first. For this server: JSONC
-stripping in linear time, the family's newest core, three advisory floors,
+stripping in linear time, the camt053 0.0.23 floor, three advisory floors,
 and the complexity, version and dependency-audit gates the rest of the
 family carries.
 
@@ -42,7 +42,7 @@ family carries.
   starts at four offenders, all in `camt053_lsp/server.py`.
 - `scripts/verify_versions.py` and a "Version sources agree" workflow:
   `pyproject.toml`, `__version__`, this file, `CITATION.cff`, the README
-  callout and `SECURITY.md` must name one version.
+  callout, `SECURITY.md` and the camt053 floor must name one version.
 - A blocking **Dependency Audit** CI job: `pip-audit` over the locked
   Poetry environment and every `requirements/*.txt`.
 - `CITATION.cff`, `AGENTS.md`, `docs/POLICIES.md`, `docs/BENCHMARKS.md`,
@@ -50,8 +50,10 @@ family carries.
 
 ### Changed
 
-- Requires **camt053 0.0.20** or newer (was 0.0.17); the hash-pinned
-  requirements had drifted to 0.0.15 and now resolve 0.0.20.
+- Requires **camt053 0.0.23** or newer (was 0.0.17), the core release of
+  the same suite version; the hash-pinned requirements had drifted to
+  0.0.15. `scripts/verify_versions.py` fails when the floor in
+  `pyproject.toml` or `requirements/*.in` differs from this version.
 - Folded Dependabot updates: black 26.10.1, ruff 0.17.1, mypy 2.4.0,
   poetry 2.5.1, cyclonedx-bom 7.5.0, the github-actions group (checkout
   and setup-python 7, codeql-action 4.38.3, scorecard-action 2.5.0) and
