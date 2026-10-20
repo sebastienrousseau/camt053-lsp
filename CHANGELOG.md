@@ -5,6 +5,66 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.23] - 2026-10-20
+
+The camt053 suite's 0.0.23 release, core first. For this server: JSONC
+stripping in linear time, the family's newest core, three advisory floors,
+and the complexity, version and dependency-audit gates the rest of the
+family carries.
+
+### Fixed
+
+- **JSONC stripping was quadratic.** Each comma copied the rest of the
+  document to look for a closing bracket, so a 1.2 MB file took 3.2 s on
+  every change (4 MB took 34 s). Both passes are now linear and live in
+  `camt053_lsp/_jsonc.py`; output is unchanged on eleven pinned edge cases
+  and 200,000 random inputs. `tests/test_stress.py` holds the scaling.
+- **anyio 4.14.2 or newer** is required: earlier releases are affected by
+  GHSA-3w57-8xmc-8v26, GHSA-5p39-cfhj-2xmp and GHSA-82r6-8w77-94w6, and
+  `poetry.lock` resolved 4.14.0.
+- The hash-pinned build tooling floors **urllib3 at 2.8.0** and
+  **virtualenv at 21.7.13** (GHSA-gh4c-6fx4-qh6g, GHSA-8988-9cw3-xx77,
+  GHSA-vxq7-64xx-v4gw; GHSA-94p9-xgh2-xp45, GHSA-9h9j-4vrj-gf7g,
+  GHSA-x78j-v8h9-3j2q, GHSA-p58f-9548-mpm2).
+- `scripts/check_suite_consistency.py` compares this tree with
+  camt053-lsp's own release (the shared copy, with `THIS`), so the window
+  between the core's tag and this one no longer reports a false mismatch.
+- `scripts/suite-status.sh` now includes `camt053-loader-mt942`.
+- The GitHub release is created as `camt053-lsp X.Y.Z`, not `vX.Y.Z`.
+- The last tag-referenced actions and the unpinned `pip install poetry`
+  are pinned (Scorecard Pinned-Dependencies).
+
+### Added
+
+- A **complexity gate**: `scripts/check_complexity.py` holds every function
+  to cyclomatic 10, cognitive 15, Halstead difficulty 30 and 60 lines (500
+  per file) against `complexity-baseline.json`, which may only shrink. It
+  starts at four offenders, all in `camt053_lsp/server.py`.
+- `scripts/verify_versions.py` and a "Version sources agree" workflow:
+  `pyproject.toml`, `__version__`, this file, `CITATION.cff`, the README
+  callout and `SECURITY.md` must name one version.
+- A blocking **Dependency Audit** CI job: `pip-audit` over the locked
+  Poetry environment and every `requirements/*.txt`.
+- `CITATION.cff`, `AGENTS.md`, `docs/POLICIES.md`, `docs/BENCHMARKS.md`,
+  `docs/COMPARISON.md`, and a VHS demo (`make demo`).
+
+### Changed
+
+- Requires **camt053 0.0.20** or newer (was 0.0.17); the hash-pinned
+  requirements had drifted to 0.0.15 and now resolve 0.0.20.
+- Folded Dependabot updates: black 26.10.1, ruff 0.17.1, mypy 2.4.0,
+  poetry 2.5.1, cyclonedx-bom 7.5.0, the github-actions group (checkout
+  and setup-python 7, codeql-action 4.38.3, scorecard-action 2.5.0) and
+  the oss-fuzz base image.
+- The README follows the portfolio template; `SECURITY.md`,
+  `docs/RELEASING.md` and the PR template are corrected against the live
+  settings and the release process.
+
+### Removed
+
+- `scripts/suite-release.sh`, which made bare version-bump releases,
+  merged them itself and tagged without the project name.
+
 ## [0.0.20] - 2026-08-29
 
 Aligns the `camt053` suite on one version number, and adds the scheduled
@@ -356,6 +416,11 @@ Part of the v0.0.6 batch tracked in #16.
 - Part of the **camt053 suite** alongside the core `camt053` library and the
   `camt053-mcp` Model Context Protocol server
 
+[0.0.23]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.23
+[0.0.20]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.20
+[0.0.18]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.18
+[0.0.17]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.17
+[0.0.16]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.16
 [0.0.14]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.14
 [0.0.13]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.13
 [0.0.9]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.9

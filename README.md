@@ -67,9 +67,10 @@
 python -m pip install camt053-lsp
 ```
 
-> **Latest release: v0.0.20**: the `camt053` suite aligned on one version
-> number, with a scheduled drift check against PyPI. Schema and IBAN/BIC
-> diagnostics, field and message-type completion, hover, code actions,
+> **Latest release: v0.0.23**: JSONC stripping in linear time (a 1.2 MB
+> document took 3.2 s per change), the camt053 0.0.20 floor, anyio
+> 4.14.2 or newer, and complexity, version and dependency-audit gates in
+> CI. Schema and IBAN/BIC diagnostics, completion, hover, code actions,
 > document symbols and formatting, all backed by `camt053.services`.
 > [See what's new →][release]
 
@@ -382,4 +383,4 @@ way, without additional terms. Dependencies keep their own licences.
 [bestpractices]: https://www.bestpractices.dev/projects/13375
 [camt053]: https://github.com/sebastienrousseau/camt053
 [pygls]: https://github.com/openlawlibrary/pygls
-[release]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.20
+[release]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.23
