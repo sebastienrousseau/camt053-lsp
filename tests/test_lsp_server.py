@@ -519,6 +519,30 @@ def test_strip_jsonc_preserves_escaped_quote_in_string():
     assert parsed == {"a": 'he said "//hi"', "b": 2}
 
 
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("[1, 2] // trailing comment, no newline", "[1, 2] "),
+        ('{"a": 1 / 2}', '{"a": 1 / 2}'),
+        (
+            '{"a": "unterminated // not a comment, ]',
+            '{"a": "unterminated // not a comment, ]',
+        ),
+        ('{"a": "ends in a backslash \\', '{"a": "ends in a backslash \\'),
+        ("[1, // why\n]", "[1 \n]"),
+        ('{"a": 1,\n\t \n}', '{"a": 1\n\t \n}'),
+        ('[[1,],{"b":[2,],},]', '[[1],{"b":[2]}]'),
+        ('"\\\\" , ]', '"\\\\"  ]'),
+        ("[1,,]", "[1,]"),
+        (",", ","),
+        ("", ""),
+    ],
+)
+def test_strip_jsonc_edge_cases(text, expected):
+    """Pinned output for comment, string, escape and comma edge cases."""
+    assert lsp_server._strip_jsonc(text) == expected
+
+
 def test_loads_tolerant_parses_clean_json_identically():
     """Clean JSON parses exactly as ``json.loads`` would."""
     assert lsp_server._loads_tolerant('[{"a": 1}]') == [{"a": 1}]
