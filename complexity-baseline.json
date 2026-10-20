@@ -1,0 +1,24 @@
+{
+  "camt053_lsp/server.py": {
+    "file_lines": 847
+  },
+  "camt053_lsp/server.py::_record_line_offsets": {
+    "cognitive": 20,
+    "cyclomatic": 12
+  },
+  "camt053_lsp/server.py::_strip_jsonc": {
+    "cognitive": 32,
+    "cyclomatic": 20,
+    "lines": 71
+  },
+  "camt053_lsp/server.py::code_actions": {
+    "cognitive": 20,
+    "cyclomatic": 13,
+    "lines": 63
+  },
+  "camt053_lsp/server.py::compute_diagnostics": {
+    "cognitive": 20,
+    "cyclomatic": 12,
+    "lines": 94
+  }
+}

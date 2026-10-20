@@ -7,3 +7,6 @@ anyio>=4.14.2
 pytest>=9.0.3,<10.0.0
 pytest-cov>=6.0.0,<8.0.0
 interrogate>=1.7
+# tests/test_check_complexity.py exercises scripts/check_complexity.py.
+radon==6.0.1
+complexipy==8.1.0
