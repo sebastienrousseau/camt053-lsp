@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import asyncio
 import importlib.util
+import inspect
 from pathlib import Path
 
 import pytest
@@ -39,7 +40,7 @@ def test_example_runs(example: Path) -> None:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     if hasattr(module, "main"):
-        if asyncio.iscoroutinefunction(module.main):
+        if inspect.iscoroutinefunction(module.main):
             asyncio.run(module.main())
         else:
             module.main()
