@@ -17,15 +17,11 @@
 completion, and hover as you author the JSON records that drive `camt.053`
 reversal generation.
 
-> **Latest release: v0.0.14** — suite-wide lockstep on camt053 0.0.14 with
-> the `click` 8.4.2 security fix (PYSEC-2026-2132 / CVE-2026-7246) baked
-> into the lock and hash-pinned CI requirements. Retains the supply-chain
-> hardening that earned the
-> [OpenSSF Best Practices **gold** badge][bestpractices-url]
-> (100%). Built on the [pygls][pygls]-based Language
-> Server with schema + IBAN/BIC diagnostics, field and message-type completion,
-> schema-description hover, code actions, document symbols, and formatting — all
-> backed by `camt053.services`. [See what's new →][release-0014]
+> **Latest release: v0.0.20**: the `camt053` suite aligned on one version
+> number, with a scheduled drift check against PyPI. Schema and IBAN/BIC
+> diagnostics, field and message-type completion, hover, code actions,
+> document symbols and formatting, all backed by `camt053.services`.
+> [See what's new →][release-0020]
 
 ## Contents
 
@@ -428,7 +424,7 @@ Built on [pygls][pygls] and [lsprotocol][lsprotocol] by the
 [lsp]: https://microsoft.github.io/language-server-protocol/
 [lsprotocol]: https://github.com/microsoft/lsprotocol
 [pygls]: https://github.com/openlawlibrary/pygls
-[release-0014]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.14
+[release-0020]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.20
 [docs-badge]: https://img.shields.io/badge/Docs-camt053.com-blue?style=for-the-badge
 [docs-url]: https://sebastienrousseau.github.io/camt053/
 [license-badge]: https://img.shields.io/pypi/l/camt053-lsp?style=for-the-badge
