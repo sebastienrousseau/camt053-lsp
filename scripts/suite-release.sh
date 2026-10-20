@@ -37,7 +37,7 @@ done
 OWNER="${OWNER:-sebastienrousseau}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SUITE_DIR="${SUITE_DIR:-$(dirname "$REPO_ROOT")}"
-ALL_REPOS=(camt053 camt053-lsp camt053-mcp camt053-writer-xlsx camt053-loader-mt940)
+ALL_REPOS=(camt053 camt053-lsp camt053-loader-mt940 camt053-loader-mt942 camt053-writer-xlsx camt053-mcp)
 if [ -n "$ONLY" ]; then IFS=',' read -r -a REPOS <<< "$ONLY"; else REPOS=("${ALL_REPOS[@]}"); fi
 
 say()  { printf '\033[1m==>\033[0m %s\n' "$*"; }

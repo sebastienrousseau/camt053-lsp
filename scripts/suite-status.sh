@@ -18,8 +18,8 @@ OWNER="${OWNER:-sebastienrousseau}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SUITE_DIR="${SUITE_DIR:-$(dirname "$REPO_ROOT")}"
 
-# Core first (dependency order); the rest are leaves.
-REPOS=(camt053 camt053-lsp camt053-mcp camt053-writer-xlsx camt053-loader-mt940)
+# Core first, then the members in the family's release order.
+REPOS=(camt053 camt053-lsp camt053-loader-mt940 camt053-loader-mt942 camt053-writer-xlsx camt053-mcp)
 
 pyproject_version() {  # $1 = repo dir
   [ -f "$1/pyproject.toml" ] || { echo "-"; return; }
