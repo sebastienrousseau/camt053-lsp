@@ -1,67 +1,77 @@
-# Releasing the camt053 suite
+<!-- SPDX-FileCopyrightText: 2026 Sebastien Rousseau <sebastian.rousseau@gmail.com> -->
+<!-- SPDX-License-Identifier: Apache-2.0 OR MIT -->
 
-The camt053 suite is versioned in **lockstep**: every package shares the same
-version and is released together. The five packages are:
+# Releasing camt053-lsp
 
-| Package | Repo |
-| :--- | :--- |
-| `camt053` (core) | [camt053](https://github.com/sebastienrousseau/camt053) |
-| `camt053-lsp` | [camt053-lsp](https://github.com/sebastienrousseau/camt053-lsp) |
-| `camt053-mcp` | [camt053-mcp](https://github.com/sebastienrousseau/camt053-mcp) |
-| `camt053-writer-xlsx` | [camt053-writer-xlsx](https://github.com/sebastienrousseau/camt053-writer-xlsx) |
-| `camt053-loader-mt940` | [camt053-loader-mt940](https://github.com/sebastienrousseau/camt053-loader-mt940) |
+The camt053 suite releases every member together at one version. The core
+goes first, then the members, in this order:
 
-## Tooling
+| Order | Package | Repository |
+| :---: | :--- | :--- |
+| 1 | `camt053` (core) | [camt053](https://github.com/sebastienrousseau/camt053) |
+| 2 | `camt053-lsp` | [camt053-lsp](https://github.com/sebastienrousseau/camt053-lsp) |
+| 3 | `camt053-loader-mt940` | [camt053-loader-mt940](https://github.com/sebastienrousseau/camt053-loader-mt940) |
+| 4 | `camt053-loader-mt942` | [camt053-loader-mt942](https://github.com/sebastienrousseau/camt053-loader-mt942) |
+| 5 | `camt053-writer-xlsx` | [camt053-writer-xlsx](https://github.com/sebastienrousseau/camt053-writer-xlsx) |
+| 6 | `camt053-mcp` | [camt053-mcp](https://github.com/sebastienrousseau/camt053-mcp) |
 
-Two scripts in [`scripts/`](../scripts) operate across the whole suite. They
-assume the sibling repos are cloned next to this one (override with
-`SUITE_DIR=/path/to/parent`).
+Each member's release is a real iteration, not a bare version bump: its
+Dependabot updates and security alerts are folded in, its floors on the
+core move to the newest released version, its open issues are triaged, and
+its CHANGELOG says what changed in it.
 
-### `scripts/suite-status.sh` — drift check (read-only)
+## The release branch
 
-Prints the version of every package across all four surfaces — local
-`pyproject.toml`, latest git tag, GitHub Release, and PyPI — and exits non-zero
-if they disagree. Run it any time; it is also run weekly in CI by
-[`suite-version-check.yml`](../.github/workflows/suite-version-check.yml).
+Work for version `X.Y.Z` happens on `feat/vX.Y.Z`, opened from `main`. Topic
+work and Dependabot updates reach it as commits, never as pull requests into
+it. One pull request, `feat: release vX.Y.Z`, takes it to `main`; it is the
+only open pull request against `main`, and the Dependabot pull requests it
+supersedes are closed with a link to it once it merges.
 
-```sh
-./scripts/suite-status.sh
-```
+Before that pull request is ready:
 
-### `scripts/suite-release.sh` — orchestrated release
+1. Every version source says `X.Y.Z`: `pyproject.toml`,
+   `camt053_lsp/__init__.py`, the `CHANGELOG.md` heading, `CITATION.cff`, the
+   README's "Latest release" callout and the `SECURITY.md` supported row.
+   `python3 scripts/verify_versions.py` checks all of them, and CI runs it.
+2. `poetry.lock` matches `pyproject.toml` (`poetry check --lock`), and the
+   hash-pinned `requirements/*.txt` are recompiled with `make pip-compile`.
+3. `make check` passes.
 
-Bumps every version source, adds a lockstep `CHANGELOG` entry, opens a PR, waits
-for CI, squash-merges, then pushes a **signed tag** that triggers each repo's
-`release.yml` (PyPI Trusted Publishing + SLSA provenance + SBOMs + GitHub
-release). It processes **core first**, then the leaf packages.
+`main` is squash-merged only (linear history, signed commits).
 
-- **Safe by default**: prints the plan and changes nothing without `--yes`.
-- **Idempotent / resumable**: repos already at the target version skip the bump;
-  existing tags are not recreated, so re-running after a partial failure
-  continues cleanly.
+## Tagging and publishing
 
-```sh
-./scripts/suite-release.sh 0.0.8            # dry run — review the plan
-./scripts/suite-release.sh 0.0.8 --yes      # perform the release
-./scripts/suite-release.sh 0.0.8 --yes --repos camt053,camt053-lsp  # subset
-```
+The tag is cut on the squash commit, only once `camt053` `X.Y.Z` is the
+latest version on PyPI (the core releases first):
 
-## Manual checklist (if releasing a single repo by hand)
+- Tag `vX.Y.Z`, SSH-signed and annotated, with the message
+  `camt053-lsp vX.Y.Z`.
+- Pushing the tag runs [`release.yml`](../.github/workflows/release.yml):
+  PyPI Trusted Publishing with PEP 740 attestations, SLSA provenance, cosign
+  signatures, and CycloneDX, SPDX and licence manifests on the GitHub
+  release.
+- The GitHub release is titled `camt053-lsp X.Y.Z` (no leading `v`). Its
+  notes have `## Highlights ⭐️`, `## What's Changed`, `## Checksums` (the
+  SHA-256 of every attached asset) and a `**Full Changelog**` compare link,
+  with no em dashes.
 
-1. Bump **all** version sources (core has three: `pyproject.toml`,
-   `camt053/__init__.py`, `camt053/constants.py`; the others have
-   `pyproject.toml` + the package `__init__.py`).
-2. If `pyproject.toml` changed, run `poetry lock` so the release SBOM job's
-   `poetry install` does not fail on a stale lock.
-3. Update `CHANGELOG.md` (+ footer link).
-4. Open a PR; merge once CI is green.
-5. `git tag -s vX.Y.Z -m vX.Y.Z && git push origin vX.Y.Z`.
-6. Confirm with `./scripts/suite-status.sh`.
+## Checking the suite
+
+- [`scripts/check_suite_consistency.py`](../scripts/check_suite_consistency.py)
+  runs daily ([`suite-consistency.yml`](../.github/workflows/suite-consistency.yml)):
+  every member must publish the core's version, and this tree must match
+  camt053-lsp's own PyPI release.
+- [`scripts/suite-status.sh`](../scripts/suite-status.sh) runs weekly
+  ([`suite-version-check.yml`](../.github/workflows/suite-version-check.yml))
+  and prints each member's version in `pyproject.toml`, its latest tag, its
+  GitHub release and PyPI. It assumes the sibling repositories are cloned
+  next to this one (override with `SUITE_DIR=/path/to/parent`).
 
 ## Branch protection note
 
-`main` on `camt053`, `camt053-lsp`, and `camt053-mcp` requires PRs (0 approvals,
-so the solo maintainer can self-merge). `camt053-lsp` additionally enforces
-admins and signed commits — squash-merges via the GitHub UI / `gh` are
-GitHub-signed and satisfy that automatically. See
-[`MAINTAINERS.md`](../MAINTAINERS.md) for the bypass procedure.
+`main` requires signed commits, linear history and the `Analyze (Python)
+(python)`, `Lint & Type Check` and `Security Scan` checks, enforced for
+admins. Squash merges through GitHub are GitHub-signed and satisfy the
+signature rule. See [`MAINTAINERS.md`](../MAINTAINERS.md) for the bypass
+procedure.
