@@ -34,7 +34,7 @@ This PR <what it does, in one plain line>.
 ## Validation
 
 * `python -m pytest`: <N passed, coverage 100% line and branch>.
-* `ruff check camt053_lsp/ tests/ benches/` and `black --check camt053_lsp/ tests/ benches/`: <result>.
+* `ruff check` and `black --check` over `camt053_lsp/ tests/ benches/ scripts/ fuzz/ examples/`: <result>.
 * `mypy camt053_lsp/`: <result>.
 * `python scripts/check_complexity.py` and `python scripts/verify_versions.py`: <result>.
 * `poetry build` and `twine check dist/*`: <result>.
