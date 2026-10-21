@@ -11,7 +11,7 @@ reversing-entry data files. Diagnostics, completion, hover, code-actions,
 document-symbols, formatting; pure helpers behind every capability so the
 same logic powers tests and downstream tooling.
 
-## Where we are (v0.0.7, shipped 2026-06-22)
+## Where we are (v0.0.23, 2026-10-20)
 
 - **7 LSP capabilities** with pure-helper backings:
   - **Diagnostics**: `compute_diagnostics` (JSON record validation,
@@ -27,18 +27,25 @@ same logic powers tests and downstream tooling.
     record + field for the editor's breadcrumb.
   - **Formatting**: `format_text` — full-document pretty-print.
 - **JSONC tolerance**: `//` line comments and trailing commas stripped
-  before parsing, so all of the above work on JSONC data files.
+  before parsing, in linear time, so all of the above work on JSONC data
+  files.
+- **Measured**: `benches/bench_diagnostics.py` reports the editor's wait
+  per change; the known cost is the core re-checking its JSON Schema for
+  every record (see [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md)).
 - **Editor wiring documentation**: `docs/quickstart.md` covers Neovim
   built-in LSP, VS Code generic LSP client, Helix/Emacs/generic
   stdio clients.
+- **Quality gates**: per-function complexity ceilings against a
+  shrinking baseline, every version source checked, `pip-audit` on the
+  lock and every hash-pinned requirements file.
 - **Supply chain**: 100% line + branch coverage, OpenSSF Scorecard,
   SLSA Build L3 + PEP 740 sigstore attestations on every release,
   CycloneDX 1.6 + SPDX 2.3 + pip-licenses SBOMs on every GitHub
   release, NIST SP 800-218 SSDF practice mapping in `SECURITY.md`.
 
-## v0.0.8 — Q3 2026
+## Next
 
-Goal: YAML support, richer code-actions, OpenSSF Best Practices Silver.
+Goal: YAML support, richer code-actions.
 
 - **YAML data file support** (mirrors the JSONC tolerance pattern):
   same 7 capabilities, just on YAML reversing-entry data files.
@@ -48,11 +55,10 @@ Goal: YAML support, richer code-actions, OpenSSF Best Practices Silver.
 - **Diagnostics for cross-record consistency**: warn when records in
   the same array reference different accounts, currencies, or
   message types that the user probably didn't intend.
-- **OpenSSF Best Practices Silver** badge live.
 - **Second maintainer** named (recruiting per
   [`MAINTAINERS.md`](MAINTAINERS.md)).
 
-## v0.0.9 — Q4 2026
+## After that
 
 Goal: editor-first ergonomics.
 
@@ -69,7 +75,7 @@ Goal: first stable minor.
 
 - **LSP helper API surface frozen**: any rename of the pure helpers
   is a minor-bump event.
-- **OpenSSF Best Practices Gold**.
+- **OpenSSF Best Practices Gold** kept (held today, project 13375).
 
 ## Out of scope (until a contributor steps up)
 

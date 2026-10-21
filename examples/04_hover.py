@@ -20,7 +20,7 @@ def main() -> None:
     cases = [
         "account_servicer_bic",  # known field with description
         "amount",
-        "nope",                  # unknown token
+        "nope",  # unknown token
     ]
     for token in cases:
         text = hover_text(token)

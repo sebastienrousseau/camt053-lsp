@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: Apache-2.0 OR MIT
+cff-version: 1.2.0
+message: "If you use camt053-lsp in research or production write-ups, please cite it as below."
+type: software
+title: "camt053-lsp: Language Server Protocol server for ISO 20022 reversing-entry files"
+abstract: >-
+  A Language Server Protocol server for authoring the JSON and JSONC
+  reversing-entry records that drive ISO 20022 camt.053 reversal generation
+  in the camt053 library: schema and IBAN/BIC diagnostics, completion,
+  hover, code actions, document symbols and formatting over stdio.
+authors:
+  - family-names: Rousseau
+    given-names: Sebastien
+    email: sebastian.rousseau@gmail.com
+version: "0.0.23"
+date-released: "2026-10-20"
+license: "Apache-2.0 OR MIT"
+repository-code: "https://github.com/sebastienrousseau/camt053-lsp"
+url: "https://sebastienrousseau.github.io/camt053/"
+keywords:
+  - ISO 20022
+  - camt.053
+  - bank statements
+  - Language Server Protocol
+  - LSP
+  - editor tooling

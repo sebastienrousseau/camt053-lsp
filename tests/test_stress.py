@@ -304,3 +304,35 @@ def test_memory_growth_bounded_under_mixed_load(reversal_record):
         f"traced memory grew {growth / 1024 / 1024:.2f} MiB "
         f"(budget {MEMORY_BUDGET / 1024 / 1024:.0f} MiB)"
     )
+
+
+# ---------------------------------------------------------------------------
+# (E) JSONC stripping scales linearly with document size.
+# ---------------------------------------------------------------------------
+def _best_of(runs: int, task) -> float:  # noqa: ANN001
+    """The fastest of ``runs`` wall-clock timings of ``task()``."""
+    timings = []
+    for _ in range(runs):
+        start = time.perf_counter()
+        task()
+        timings.append(time.perf_counter() - start)
+    return min(timings)
+
+
+def test_strip_jsonc_scales_linearly(reversal_record):
+    """Eight times the records costs about eight times the time.
+
+    Every keystroke re-parses the whole document, so a superlinear pass
+    turns a large data file into a stalled editor. Each comma used to
+    copy the rest of the document to look ahead for ``}`` or ``]``,
+    which made a 1.2 MB file take seconds. Linear work gives a ratio
+    near 8; the quadratic pass gave about 50.
+    """
+    small = json.dumps([reversal_record] * 250, indent=2)
+    large = json.dumps([reversal_record] * 2000, indent=2)
+    t_small = _best_of(3, lambda: lsp_server._strip_jsonc(small))
+    t_large = _best_of(3, lambda: lsp_server._strip_jsonc(large))
+    assert t_large / t_small < 20, (
+        f"{t_small:.4f}s for {len(small)} chars, "
+        f"{t_large:.4f}s for {len(large)} chars"
+    )

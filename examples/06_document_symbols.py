@@ -19,7 +19,9 @@ from camt053_lsp.server import document_symbols
 
 
 def main() -> None:
-    text = (Path(__file__).parent / "_data" / "sample_records.json").read_text()
+    text = (
+        Path(__file__).parent / "_data" / "sample_records.json"
+    ).read_text()
     symbols = document_symbols(text)
     print(f"top-level symbols: {len(symbols)}")
     for s in symbols:

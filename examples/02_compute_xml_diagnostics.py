@@ -24,7 +24,7 @@ WELL_FORMED = """<?xml version="1.0" encoding="UTF-8"?>
 </Document>"""
 
 BROKEN_OPEN = "<Document><BkToCstmrStmt><GrpHdr>"  # never closed
-BROKEN_AMP = "<Doc>tom & jerry</Doc>"              # unescaped ampersand
+BROKEN_AMP = "<Doc>tom & jerry</Doc>"  # unescaped ampersand
 
 
 def main() -> None:

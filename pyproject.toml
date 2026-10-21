@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "camt053-lsp"
-version = "0.0.20"
+version = "0.0.23"
 description = "Language Server Protocol (LSP) server for authoring camt053 ISO 20022 camt.053 reversing-entry data files."
 authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
 license = "Apache-2.0 OR MIT"
@@ -16,14 +16,19 @@ camt053-lsp = "camt053_lsp.server:main"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
-camt053 = ">=0.0.17,<1"
+camt053 = ">=0.0.23,<1"
 pygls = ">=1.3"
+# Not imported here; reached through camt053 (httpx, starlette). Every
+# release before 4.14.2 is affected by GHSA-3w57-8xmc-8v26,
+# GHSA-5p39-cfhj-2xmp and GHSA-82r6-8w77-94w6, so none may resolve. The
+# <5 cap matches the camt053 core.
+anyio = ">=4.14.2,<5"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=9.0.3,<10.0.0"
 pytest-cov = ">=6.0.0,<8.0.0"
 black = "^26.3.1"
-ruff = ">=0.1,<0.17"
+ruff = ">=0.1,<0.18"
 mypy = ">=1.11,<3.0"
 bandit = "^1.7.0"
 interrogate = "^1.7"
@@ -32,6 +37,9 @@ interrogate = "^1.7"
 # backport the conformance gate does not run there at all.
 tomli = { version = ">=2", python = "<3.11" }
 packaging = ">=23"
+# scripts/check_complexity.py (make complexity, CI "complexity" job).
+radon = "6.0.1"
+complexipy = { version = "8.1.0", python = "<3.16" }
 
 
 [tool.interrogate]

@@ -1,444 +1,386 @@
-# camt053-lsp: A Language Server for Authoring ISO 20022 Reversing-Entry Files
+<!-- SPDX-FileCopyrightText: 2023-2026 Sebastien Rousseau <sebastian.rousseau@gmail.com> -->
+<!-- SPDX-License-Identifier: Apache-2.0 OR MIT -->
 
 <p align="center">
   <img src="https://cloudcdn.pro/camt053/v1/logos/camt053.svg" alt="camt053-lsp logo" width="128" />
 </p>
 
-[![PyPI Version][pypi-badge]][07]
-[![Python Versions][python-versions-badge]][07]
-[![License][license-badge]][01]
-[![Tests][tests-badge]][tests-url]
-[![Quality][quality-badge]][quality-url]
-[![OpenSSF Scorecard][scorecard-badge]][scorecard-url]
-[![OpenSSF Best Practices][bestpractices-badge]][bestpractices-url]
-[![Documentation][docs-badge]][docs-url]
+<h1 align="center">camt053-lsp</h1>
 
-**Real-time editor help for ISO 20022 reversing-entry files** — diagnostics,
-completion, and hover as you author the JSON records that drive `camt.053`
-reversal generation.
+<p align="center">
+  A Language Server that checks ISO 20022 reversing-entry records as you type them.
+</p>
 
-> **Latest release: v0.0.14** — suite-wide lockstep on camt053 0.0.14 with
-> the `click` 8.4.2 security fix (PYSEC-2026-2132 / CVE-2026-7246) baked
-> into the lock and hash-pinned CI requirements. Retains the supply-chain
-> hardening that earned the
-> [OpenSSF Best Practices **gold** badge][bestpractices-url]
-> (100%). Built on the [pygls][pygls]-based Language
-> Server with schema + IBAN/BIC diagnostics, field and message-type completion,
-> schema-description hover, code actions, document symbols, and formatting — all
-> backed by `camt053.services`. [See what's new →][release-0014]
+<p align="center">
+  <a href="https://github.com/sebastienrousseau/camt053-lsp/actions"><img src="https://img.shields.io/github/actions/workflow/status/sebastienrousseau/camt053-lsp/ci.yml?style=for-the-badge&logo=github" alt="Build" height="28" /></a>
+  <a href="https://pypi.org/project/camt053-lsp/"><img src="https://img.shields.io/pypi/v/camt053-lsp?style=for-the-badge&color=fc8d62&logo=python" alt="Registry" height="28" /></a>
+  <a href="https://sebastienrousseau.github.io/camt053/"><img src="https://img.shields.io/badge/docs-camt053-blue?style=for-the-badge&labelColor=555555&logo=readthedocs" alt="Docs" height="28" /></a>
+  <a href="https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/camt053-lsp"><img src="https://img.shields.io/ossf-scorecard/github.com/sebastienrousseau/camt053-lsp?style=for-the-badge&label=OpenSSF%20Scorecard&logo=openssf" alt="OpenSSF Scorecard" height="28" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg?style=for-the-badge" alt="License: Apache-2.0 OR MIT" height="28" /></a>
+  <a href="https://github.com/sebastienrousseau/camt053-lsp/blob/main/docs/POLICIES.md"><img src="https://img.shields.io/badge/Python-3.10%2B-93450a.svg?style=for-the-badge&logo=python" alt="Python 3.10 or newer" height="28" /></a>
+  <a href="https://www.bestpractices.dev/projects/13375"><img src="https://img.shields.io/cii/level/13375?style=for-the-badge&label=OpenSSF%20Best%20Practices&logo=openssf" alt="OpenSSF Best Practices" height="28" /></a>
+</p>
+
+<p align="center">
+  <img src=".github/demo.gif" alt="camt053-lsp demo: the command-line help, then the diagnostics and code-action helpers the server runs on every edit, against sample reversing-entry records" width="100%" />
+</p>
+
+---
 
 ## Contents
 
-- [Overview](#overview)
-- [Install](#install)
-- [Quick Start](#quick-start)
-  - [Editor wiring](#editor-wiring)
-- [Features](#features)
-- [Using the helpers](#using-the-helpers)
-- [Examples](#examples)
-- [The camt053 suite](#the-camt053-suite)
-- [When not to use camt053-lsp](#when-not-to-use-camt053-lsp)
-- [Development](#development)
-- [Security](#security)
-- [Documentation](#documentation)
+**Getting started**
+
+- [Install](#install) — pip, pipx or uv, then editor wiring
+- [Requirements](#requirements) — toolchain floor, platforms
+- [Quick Start](#quick-start) — point your editor at `camt053-lsp`, or call the helpers directly
+
+**The camt053-lsp ecosystem**
+
+- [The camt053-lsp ecosystem](#the-camt053-lsp-ecosystem) — the camt053 core library and its five companion packages
+
+**Library reference**
+
+- [Capabilities at a glance](#capabilities-at-a-glance) — the current surface by theme
+- [Ecosystem comparison](#ecosystem-comparison) — short matrix; full table at [`docs/COMPARISON.md`](docs/COMPARISON.md)
+- [Benchmarks](#benchmarks) — headline numbers; full table at [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md)
+- [Features](#features) — module-level capability list
+- [Configuration](#configuration) — core options
+- [Examples](#examples) — runnable example index
+
+**Operational**
+
+- [When not to use camt053-lsp](#when-not-to-use-camt053-lsp) — limitations
+- [Development](#development) — make targets, fuzzing, CI
+- [Security](#security) — guarantees and compliance
+- [Documentation](#documentation) — all reference docs
+- [Stability guarantees](#stability-guarantees) — SemVer axis, output stability, minimum toolchain discipline
 - [License](#license)
-- [Contributing](#contributing)
-- [Acknowledgements](#acknowledgements)
 
-## Overview
-
-A **Language Server** speaks the
-[Language Server Protocol (LSP)][lsp] — the editor-agnostic protocol that lets a
-single backend deliver diagnostics, completion, hover, and more to any LSP
-client (VS Code, Neovim, Helix, Emacs, …). **camt053-lsp** is that backend for
-**reversing-entry data JSON files**: the JSON arrays of flat reversing-entry
-records that drive ISO 20022 `camt.053` reversal generation in the
-[`camt053`][camt053] suite.
-
-- **Website:** <https://sebastienrousseau.github.io/camt053/>
-- **Source code:** <https://github.com/sebastienrousseau/camt053-lsp>
-- **Bug reports:** <https://github.com/sebastienrousseau/camt053-lsp/issues>
-
-It gives editors three features as you type, all backed by
-`camt053.services` so they behave identically to the CLI, REST API, and MCP
-server:
-
-- **Diagnostics** — each record is validated against a message type's input
-  JSON Schema, and any IBAN / BIC identifier values are additionally
-  checked with the dedicated validators.
-- **Completion** — every input field (with its description) plus the list of
-  supported `camt` message types.
-- **Hover** — the schema description for the field under the cursor.
-
-The intended message type defaults to `camt.053.001.14` (Bank to Customer
-Statement); the pure helpers accept a `message_type` argument so a different
-type can be configured.
-
-**camt053-lsp** is part of the **camt053 suite** — a set of independently
-installable packages (all Python 3.10+) sharing the `camt053.services` layer:
-
-| Package | Role |
-|---------|------|
-| [`camt053`](https://pypi.org/project/camt053/) | Core library + Click CLI + FastAPI REST API |
-| [`camt053-mcp`](https://pypi.org/project/camt053-mcp/) | Model Context Protocol server (for AI agents) |
-| `camt053-lsp` | **Language Server Protocol server (this package)** |
-
-```mermaid
-flowchart LR
-    A["Editor (VS Code / Neovim / …)"] -->|LSP over stdio| B["camt053-lsp"]
-    B -->|compute_diagnostics / completion_items / hover_text| C["camt053.services"]
-    C -->|schema + IBAN/BIC validation| B
-    B -->|diagnostics · completion · hover| A
-```
+---
 
 ## Install
 
-**camt053-lsp** runs on macOS, Linux, and Windows and requires **Python 3.10+**
-and **pip**. It pulls in the core [`camt053`][camt053] library and
-[`pygls`][pygls] automatically.
+### As a Python library
 
 ```sh
 python -m pip install camt053-lsp
 ```
 
-Verify the installation:
+> **Latest release: v0.0.23**: JSONC stripping in linear time (a 1.2 MB
+> document took 3.2 s per change), the camt053 0.0.23 floor, anyio
+> 4.14.2 or newer, and complexity, version and dependency-audit gates in
+> CI. Schema and IBAN/BIC diagnostics, completion, hover, code actions,
+> document symbols and formatting, all backed by `camt053.services`.
+> [See what's new →][release]
+
+The package installs a `camt053-lsp` console command and pulls in the core
+[`camt053`][camt053] library and [`pygls`][pygls]. To keep the command on
+your `PATH` without touching a project environment:
 
 ```sh
-python -c "import camt053_lsp; print('camt053-lsp', camt053_lsp.__version__)"
+pipx install camt053-lsp
+uv tool install camt053-lsp
 ```
 
-<details>
-<summary>Using an isolated virtual environment (recommended)</summary>
+Check the install:
 
 ```sh
-python -m venv venv
-source venv/bin/activate        # macOS/Linux
-venv\Scripts\activate           # Windows
-python -m pip install -U camt053-lsp
+camt053-lsp --version
 ```
-</details>
+
+---
+
+## Requirements
+
+- Python 3.10 or newer, tested in CI on 3.10, 3.11, 3.12, 3.13 and 3.14 on
+  Linux ([toolchain policy](docs/POLICIES.md)). The package is pure Python
+  and runs wherever its dependencies do: macOS, Linux and Windows.
+- `camt053` 0.0.23 or newer (below 1.0) and `pygls` 1.3 or newer, installed
+  automatically.
+- `anyio` 4.14.2 or newer: earlier releases are affected by
+  GHSA-3w57-8xmc-8v26, GHSA-5p39-cfhj-2xmp and GHSA-82r6-8w77-94w6 and cannot
+  resolve.
+- An editor with a Language Server Protocol client (Neovim, VS Code, Helix,
+  Emacs, Sublime Text LSP and others).
+
+---
 
 ## Quick Start
 
-For the 10-minute install → editor wiring → first reversing-entry
-edit tutorial, see [`docs/quickstart.md`](docs/quickstart.md).
-
-The package installs a `camt053-lsp` console entry point that starts the
-language server over **stdio**:
-
-```sh
-camt053-lsp
+```lua
+-- Neovim 0.11+, built-in LSP client
+vim.lsp.config["camt053"] = {
+  cmd = { "camt053-lsp" },
+  filetypes = { "json", "jsonc" },
+  root_markers = { ".git" },
+}
+vim.lsp.enable("camt053")
 ```
 
-The command speaks LSP on stdin/stdout — it is meant to be launched by your
-editor's LSP client, not used interactively. Point your editor at it for JSON
-reversing-entry data files and you get diagnostics, completion, and hover as you
-type.
+Open a JSON (or JSONC) array of reversing-entry records. The server
+validates every record on open and on each change, completes field names and
+`camt` message types, shows schema descriptions on hover, offers a quick fix
+that inserts missing required fields, and outlines the document by record.
+`camt053-lsp` speaks LSP on stdin and stdout, so any editor that can spawn a
+command over stdio can use it; [`docs/quickstart.md`](docs/quickstart.md)
+covers VS Code, Helix and Emacs.
 
-### Command-line options
+The same logic is importable, without an editor:
+
+```python
+import json
+
+from camt053_lsp.server import code_actions, compute_diagnostics
+
+doc = json.dumps([{"statement_msg_id": "RVSL-STMT-0001"}])
+for diagnostic in compute_diagnostics(doc)[:2]:
+    print(diagnostic["severity"], diagnostic["message"])
+print(code_actions(doc)[0]["title"])
+```
+
+---
+
+## The camt053-lsp ecosystem
+
+`camt053-lsp` is one of six packages built around the [`camt053`][camt053]
+library for ISO 20022 bank-to-customer statements. They release together at
+one version, the core first, and every interface calls the same
+`camt053.services` layer, so the editor, the command line, the REST API and
+an AI agent all apply the same rules.
+
+| Component | Purpose | Use case |
+| :--- | :--- | :--- |
+| [`camt053`](https://github.com/sebastienrousseau/camt053) | Core library, Click CLI and FastAPI REST API: parse, validate and reverse `camt.053` statements | You process statements in code, scripts or a service |
+| [`camt053-lsp`](#install) | Language Server for the reversing-entry records that drive reversal generation | You author or review those records in an editor: **this package** |
+| [`camt053-loader-mt940`](https://github.com/sebastienrousseau/camt053-loader-mt940) | SWIFT MT940 to `camt.053` loader | Your statements still arrive as MT940 |
+| [`camt053-loader-mt942`](https://github.com/sebastienrousseau/camt053-loader-mt942) | SWIFT MT942 interim reports to `camt.052` | You need intraday reports in ISO 20022 form |
+| [`camt053-writer-xlsx`](https://github.com/sebastienrousseau/camt053-writer-xlsx) | Excel `.xlsx` writer for parsed statements | Finance teams want a spreadsheet |
+| [`camt053-mcp`](https://github.com/sebastienrousseau/camt053-mcp) | Model Context Protocol server exposing the library as agent tools | You work with statements from an AI assistant |
+
+---
+
+## Capabilities at a glance
+
+| Area | Capability | Status |
+| :--- | :--- | :--- |
+| Diagnostics | Each record checked against the message type's input JSON Schema; IBAN and BIC fields checked with the core validators | Released |
+| Diagnostics (XML) | CBPR+ November 2026 readiness issues on opened `camt.05x` XML, detected by content | Released |
+| Completion | Every input field with its schema description, plus every supported `camt` message type | Released |
+| Hover | Field descriptions, and the human-readable name of a `camt.05x` message type | Released |
+| Code actions | Quick fix inserting a record's missing required fields | Released |
+| Outline | One document symbol per record, one child per field | Released |
+| Formatting | Whole-document pretty-print, 2-space indent, key order kept | Released |
+| JSONC | `//` comments and trailing commas accepted by every feature | Released; linear time since 0.0.23 |
+| YAML data files | Same features on YAML | Planned, see [`ROADMAP.md`](ROADMAP.md) |
+
+---
+
+## Ecosystem comparison
+
+The alternatives to this server are a JSON Schema alone, in any schema-aware
+editor, and running the `camt053` command line after saving.
+
+| Project | Feedback while typing | IBAN check digits | Quick fix for missing fields |
+| :--- | :---: | :---: | :---: |
+| **camt053-lsp** | Yes | Yes | Yes |
+| A JSON Schema alone | Yes | No | No |
+| `camt053` CLI | No | Yes | No |
+
+See [`docs/COMPARISON.md`](docs/COMPARISON.md) for the evidence and complete matrix.
+
+---
+
+## Benchmarks
+
+Diagnostics run on every keystroke, so the number that matters is how large
+a document stays interactive. Measured with `benches/bench_diagnostics.py`
+for 0.0.18. Most of the cost is the core library re-checking its JSON Schema
+for every record; see the benchmarks page for the profile.
+
+| Scenario | Result | Environment |
+| :--- | ---: | :--- |
+| Diagnostics, cost per record | 0.86 ms | recorded for 0.0.18 (2026-08-29) |
+| Interactive budget (under 100 ms per change) | ~116 records | recorded for 0.0.18 (2026-08-29) |
+| JSONC stripping, 1.2 MB document | 3.2 s before 0.0.23, linear since | Apple A18 Pro, Python 3.12.15 |
+
+See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for methodology and full results.
+
+---
+
+## Features
+
+For reversing-entry data files: a JSON array of flat reversing-entry
+records, or a single record object treated as one record.
+
+- **Diagnostics**: schema validation reports missing required fields, wrong
+  types, and pattern or length violations. `account_id`,
+  `account_servicer_bic` and `counterparty_account` are also checked as IBAN
+  or BIC. Malformed JSON gives one syntax diagnostic at the offending
+  position. Opened `camt.05x` XML gets the CBPR+ November 2026 readiness
+  checks instead.
+- **Completion**: every input field for the message type, with its schema
+  description as the detail, plus every supported `camt` message type.
+- **Hover**: the schema `description` of the field under the cursor, or the
+  name of a supported message type (`camt.053.001.14`: Bank To Customer
+  Statement).
+- **Code actions**: for each record missing required fields, a quick fix
+  inserts the missing keys with empty placeholder values. Valid records and
+  malformed JSON propose nothing.
+- **Document symbols**: one symbol per record (`Record N`, with its
+  `statement_msg_id` or `entry_ref` as the detail) and a child per field.
+- **Formatting**: pretty-prints the document with a stable 2-space indent,
+  keeping key order, as one full-document edit. Invalid JSON is left alone.
+- **JSONC tolerance**: `//` line comments and trailing commas are removed
+  before parsing (`camt053_lsp/_jsonc.py`). Clean JSON is unaffected.
+
+The logic lives in pure helpers in `camt053_lsp.server`:
+`compute_diagnostics`, `compute_xml_diagnostics`, `completion_items`,
+`hover_text`, `hover_markup`, `message_type_name`, `code_actions`,
+`document_symbols` and `format_text`. The LSP handlers map their plain dicts
+to `lsprotocol` types. Each diagnostic is
+`{"line": int, "character": int, "severity": "error" | "warning", "message": str}`.
+
+---
+
+## Configuration
 
 | Flag | Description |
 | --- | --- |
 | `--version` | Print the package version and exit. |
 | `--help` | Print usage and exit. |
-| `--log-level {DEBUG,INFO,WARNING,ERROR}` | Set the logging verbosity (default: `WARNING`). |
+| `--log-level {DEBUG,INFO,WARNING,ERROR}` | Logging verbosity (default `WARNING`). |
 
-Logs are written to **stderr** so they never corrupt the LSP transport, which
-owns stdout. Raise the level when diagnosing editor-integration issues:
+With no arguments the server speaks LSP over stdio. Logs go to stderr so
+they never corrupt the transport on stdout; raise the level when an editor
+integration misbehaves:
 
 ```sh
 camt053-lsp --log-level DEBUG
 ```
 
-### Editor wiring
+The message type defaults to `camt.053.001.14` (Bank to Customer
+Statement). The helpers take a `message_type` argument for the others.
 
-Register `camt053-lsp` as the server `cmd` for JSON files in your editor's LSP
-client.
-
-<details>
-<summary>Neovim (built-in <code>vim.lsp.config</code>)</summary>
-
-```lua
-vim.lsp.config["camt053"] = {
-  cmd = { "camt053-lsp" },
-  filetypes = { "json" },
-  root_markers = { ".git" },
-}
-vim.lsp.enable("camt053")
-```
-</details>
-
-<details>
-<summary>VS Code (generic LSP client)</summary>
-
-Configure a generic LSP client extension to spawn the `camt053-lsp` command over
-stdio for the `json` language, or wrap it in a small extension whose
-`serverOptions` is `{ command: "camt053-lsp", transport: TransportKind.stdio }`.
-</details>
-
-Open a JSON array of reversing-entry records and the server validates each
-record on open and on every change, surfaces completion for field names and
-message types, and shows schema descriptions on hover.
-
-## Features
-
-For reversing-entry data JSON files (a JSON array of flat reversing-entry
-records, or a single record object treated as one record):
-
-- **Diagnostics** — schema validation reports missing required fields, wrong
-  types, and pattern/length violations; identifier fields (`account_id`,
-  `account_servicer_bic`, `counterparty_account`) are additionally checked as
-  IBAN / BIC. Malformed JSON yields a single syntax diagnostic at the offending
-  position.
-- **Completion** — every input field for the message type (with its schema
-  description as the detail) plus every supported `camt` message type.
-- **Hover** — the schema `description` for the field name under the cursor, or
-  the human-readable name when the token is a supported `camt.05x` message type
-  (e.g. `camt.053.001.14 — Bank To Customer Statement`).
-- **Code actions** — for each record missing required fields, a quick-fix
-  inserts the missing keys (with empty placeholder values) into that record.
-  Valid records and malformed JSON propose no action.
-- **Document symbols (outline)** — one symbol per record (named `Record N`,
-  with its `statement_msg_id` / `entry_ref` as the detail) and a child symbol
-  for every field, so editors can render an outline / breadcrumb. Malformed
-  JSON yields an empty outline.
-- **Formatting** — pretty-prints the whole document with a stable 2-space
-  indent while preserving key order, returned as a single full-document edit.
-  Invalid JSON leaves the document unchanged.
-- **JSONC tolerance** — `//` line comments and trailing commas are stripped
-  before parsing, so all of the above work on JSONC data files. Clean JSON is
-  unaffected. (YAML data files are a planned future enhancement.)
-
-The feature logic lives in pure, importable helpers (`compute_diagnostics`,
-`completion_items`, `hover_text`, `hover_markup`, `message_type_name`,
-`code_actions`, `document_symbols`, `format_text`) backed by the shared
-`camt053.services` layer, so editor behaviour stays in lockstep with
-the CLI, REST API, and MCP server. The LSP handlers are thin glue that map those
-plain dicts to `lsprotocol` types.
-
-## Using the helpers
-
-Because the feature logic is pure, you can call it directly — no editor or
-server process required. This is exactly what the server runs on each edit:
-
-```python
-import json
-
-from camt053_lsp.server import (
-    code_actions,
-    completion_items,
-    compute_diagnostics,
-    document_symbols,
-    format_text,
-    hover_markup,
-    hover_text,
-)
-
-# A complete, valid reversing-entry record produces no diagnostics.
-valid_doc = json.dumps(
-    [
-        {
-            "statement_msg_id": "RVSL-STMT-0001",
-            "creation_date_time": "2026-06-15T08:00:00",
-            "statement_id": "RVSL-STMT-0001",
-            "account_id": "GB29NWBK60161331926819",
-            "account_currency": "EUR",
-            "account_servicer_bic": "NWBKGB2LXXX",
-            "amount": "1500.00",
-            "currency": "EUR",
-            "credit_debit": "DBIT",
-            "reason_code": "AC04",
-            "counterparty_account": "DE89370400440532013000",
-        }
-    ]
-)
-assert compute_diagnostics(valid_doc) == []
-
-# Missing required fields are reported as errors.
-missing = json.dumps([{"statement_msg_id": "ONLY-ID"}])
-print(len(compute_diagnostics(missing)), "issue(s)")
-
-# An invalid BIC is flagged as a warning.
-bad_bic = json.dumps([{"account_servicer_bic": "INVALID"}])
-print(compute_diagnostics(bad_bic)[:1])
-
-# Completion offers field names and message types; hover shows descriptions.
-items = completion_items()
-print(len(items), "completion items, e.g.", items[0]["label"])
-print(hover_text("account_servicer_bic"))   # -> the field's schema description
-print(hover_text("nope"))                    # -> None
-
-# Hover markup also names a message type under the cursor.
-print(hover_markup("camt.053.001.14"))       # -> "camt.053.001.14 — Bank ..."
-
-# Code actions propose inserting a record's missing required fields.
-fixes = code_actions(missing)
-print(fixes[0]["title"])                     # -> "Insert missing required ..."
-print(code_actions(valid_doc))               # -> [] (nothing to fix)
-
-# Document symbols build an outline: one symbol per record, fields as children.
-outline = document_symbols(valid_doc)
-print(outline[0]["name"], "->", len(outline[0]["children"]), "fields")
-
-# Formatting pretty-prints the document (2-space indent, key order preserved).
-print(format_text('[{"b":1,"a":2}]'))        # -> formatted JSON string
-print(format_text("[{not json}]"))           # -> None (left unchanged)
-
-# JSONC sugar (// comments, trailing commas) is tolerated everywhere.
-jsonc = '[\n  // a record\n  {"statement_msg_id": "ID-1",},\n]'
-print(compute_diagnostics(jsonc)[:1])        # parses fine
-```
-
-Each diagnostic is a plain dict —
-`{"line": int, "character": int, "severity": "error" | "warning", "message": str}` —
-which the server maps to `lsprotocol` `Diagnostic` objects before publishing.
-
-See [`examples/lsp_helpers.py`](examples/lsp_helpers.py) for the full runnable
-script.
+---
 
 ## Examples
 
-The [`examples/`](examples/) directory contains a self-contained, runnable
-script for the helper API:
+One runnable script per capability in [`examples/`](examples/README.md),
+each run end to end by `tests/test_examples.py`:
 
 | Example | Demonstrates |
-|---------|--------------|
-| [`lsp_helpers.py`](examples/lsp_helpers.py) | The LSP diagnostics / completion / hover helpers |
+| :--- | :--- |
+| [`01_compute_diagnostics.py`](examples/01_compute_diagnostics.py) | Schema and IBAN/BIC diagnostics on JSON records |
+| [`02_compute_xml_diagnostics.py`](examples/02_compute_xml_diagnostics.py) | CBPR+ readiness diagnostics on `camt.05x` XML |
+| [`03_completion.py`](examples/03_completion.py) | Field and message-type completion |
+| [`04_hover.py`](examples/04_hover.py) | Schema-description hover |
+| [`05_code_actions.py`](examples/05_code_actions.py) | The missing-fields quick fix |
+| [`06_document_symbols.py`](examples/06_document_symbols.py) | The per-record outline |
+| [`07_formatting.py`](examples/07_formatting.py) | JSONC-tolerant formatting |
+| [`lsp_helpers.py`](examples/lsp_helpers.py) | All of the above in one script |
 
 ```sh
 git clone https://github.com/sebastienrousseau/camt053-lsp.git && cd camt053-lsp
-python examples/lsp_helpers.py
+poetry install
+poetry run python examples/01_compute_diagnostics.py
 ```
 
-## The camt053 suite
-
-`camt053-lsp` is part of a set of independently installable packages
-built around the [`camt053`][camt053] library — pick whichever ones
-your stack needs:
-
-| Package | Role |
-| :--- | :--- |
-| [`camt053`](https://pypi.org/project/camt053/) | Core library + CLI + FastAPI REST API |
-| [`camt053-mcp`](https://pypi.org/project/camt053-mcp/) | Model Context Protocol server (for AI agents) |
-| [`camt053-lsp`](https://pypi.org/project/camt053-lsp/) | **Language Server Protocol server (this package)** |
-| [`camt053-writer-xlsx`](https://pypi.org/project/camt053-writer-xlsx/) | Excel `.xlsx` writer for parsed statements |
-| [`camt053-loader-mt940`](https://pypi.org/project/camt053-loader-mt940/) | SWIFT MT940 → camt.053 loader |
-
-Every helper here is a thin typed wrapper over `camt053.services` —
-the same facade the CLI, REST API, and MCP server use — so all four
-interfaces behave identically.
+---
 
 ## When not to use camt053-lsp
 
-- **You have no LSP-capable editor.** This server only makes sense
-  paired with an LSP client (VS Code, Neovim, Helix, Sublime LSP,
-  etc.). Scripted / CI use is better served by the camt053 CLI and
-  REST API.
-- **You are authoring camt.053 XML statements** (rather than the
-  reversing-entry JSON the LSP targets). The CBPR+ Nov 2026
-  diagnostics added in v0.0.6 *do* fire on opened XML files (auto-
-  detected by content), but full XML-authoring features (completion,
-  schema-aware hover) are not the LSP's primary mode.
-- **You need single-file linting outside an editor.** Use the CLI:
-  `camt053 check-cbpr-readiness statement.xml` covers the
-  same ground the LSP surfaces on save.
-- **You need to *generate* pain.001 outbound payment files.** Out of
-  scope; use the [`pain001-lsp`](https://github.com/sebastienrousseau/pain001-lsp)
-  for that workflow.
+- **You have no LSP-capable editor.** Scripts and CI are better served by
+  the `camt053` CLI and REST API.
+- **You are authoring `camt.053` XML.** The CBPR+ diagnostics fire on opened
+  XML, but completion and schema-aware hover target the reversing-entry
+  JSON records, not XML.
+- **You lint files outside an editor.** Use the CLI:
+  `camt053 check-cbpr-readiness statement.xml` or `camt053 validate`.
+- **Your documents run to thousands of records.** Diagnostics cost about
+  0.86 ms per record (see [Benchmarks](#benchmarks)), so very large files lag
+  on every change until the core validator is faster.
+- **You generate `pain.001` payment files.** Use
+  [`pain001-lsp`](https://github.com/sebastienrousseau/pain001-lsp).
+
+---
 
 ## Development
 
-**camt053-lsp** uses [Poetry](https://python-poetry.org/) and
-[mise](https://mise.jdx.dev/).
-
 ```bash
 git clone https://github.com/sebastienrousseau/camt053-lsp.git && cd camt053-lsp
-mise install
 poetry install
-poetry shell
+make check         # lint, mypy, bandit, complexity, tests, examples
+make test          # pytest, 100% line and branch coverage enforced
+make complexity    # per-function ceilings against complexity-baseline.json
+make fuzz          # the Atheris harness, locally
+make pip-compile   # regenerate the hash-pinned requirements/*.txt
+make demo          # re-render .github/demo.gif with VHS
 ```
 
-A `Makefile` orchestrates the quality gates (kept in lockstep with CI):
+CI installs from hash-pinned `requirements/*.txt` (compiled from
+`requirements/*.in` with `uv pip compile --generate-hashes`) and runs the
+test matrix on Python 3.10 to 3.14, ruff, black, mypy in strict mode,
+bandit, interrogate (100% docstrings), the complexity ceilings, the
+version-source check, CodeQL, OpenSSF Scorecard and ClusterFuzzLite. See
+[`CONTRIBUTING.md`](CONTRIBUTING.md) and [`docs/RELEASING.md`](docs/RELEASING.md).
 
-```bash
-make check        # all gates (REQUIRED before commit)
-make test         # pytest (100% line + branch coverage enforced)
-make lint         # ruff + black
-make type-check   # mypy --strict
-make security     # bandit
-make examples     # run the example scripts
-make fuzz         # run the Atheris fuzz harness locally
-make pip-compile  # regenerate the hash-pinned requirements/*.txt
-```
-
-CI installs are **hash-pinned**: each job installs from a
-`requirements/*.txt` lockfile (compiled from `requirements/*.in` with
-`uv pip compile --generate-hashes`) using `pip install --require-hashes`.
-Regenerate them with `make pip-compile` after changing a `.in` file.
+---
 
 ## Security
 
-`camt053-lsp` is a thin wrapper — every helper delegates to
-`camt053.services`, where the defence-in-depth (defusedxml +
-`xml_guard` byte cap + DOCTYPE / ENTITY pre-flight) lives. The LSP
-itself does no network I/O and treats the open document as
-untrusted text. The text-driven entry points are **continuously
-fuzzed** with [Atheris][atheris] under
-[ClusterFuzzLite](https://google.github.io/clusterfuzzlite/) (see
-[`fuzz/`](fuzz/) and [`.clusterfuzzlite/`](.clusterfuzzlite/)) so
-malformed JSON/JSONC/XML cannot crash the server. Supply-chain
-hardening — SHA-pinned Actions, hash-pinned `pip` installs, and
-least-privilege workflow tokens — is tracked by
-[OpenSSF Scorecard][scorecard-url]. Reporting practice, supported
-versions, and the full posture are documented in
-[`SECURITY.md`](SECURITY.md). Vulnerabilities go via GitHub Private
-Vulnerability Reporting, not public issues.
+The server reads only the document text the editor sends over stdio. It
+opens no network socket, executes nothing from the document, and parses
+JSON with the standard library after a purely syntactic JSONC pass. XML goes
+to `camt053.services`, which uses `defusedxml` with a byte cap and a
+DOCTYPE and ENTITY pre-flight. The text entry points are fuzzed with
+[Atheris][atheris] under ClusterFuzzLite on every pull request and on a
+schedule (see [`fuzz/`](fuzz/)). Actions are pinned by SHA, `pip` installs
+are hash-pinned, workflow tokens are least-privilege, and releases carry
+SLSA provenance, PEP 740 attestations and cosign signatures. The project
+holds the [OpenSSF Best Practices][bestpractices] badge.
+
+Report vulnerabilities according to [`SECURITY.md`](SECURITY.md).
+
+---
 
 ## Documentation
 
-- [`README.md`](README.md) — this file
-- [`CHANGELOG.md`](CHANGELOG.md) — release notes
-- [`SECURITY.md`](SECURITY.md) — disclosure + supported versions
-- [`SUPPORT.md`](SUPPORT.md) — how to get help
-- [`MAINTAINERS.md`](MAINTAINERS.md) — who can merge
-- [`examples/`](examples/) — runnable scripts
+[User manual](https://sebastienrousseau.github.io/camt053/) ·
+[API reference: the helpers](#features) ·
+[Developer guide](CONTRIBUTING.md) ·
+[Family map](#the-camt053-lsp-ecosystem) ·
+[Quickstart](docs/quickstart.md) · [Releasing](docs/RELEASING.md) ·
+[Changelog](CHANGELOG.md) · [Roadmap](ROADMAP.md) ·
+[Security policy](SECURITY.md) · [Support](SUPPORT.md)
+
+---
+
+## Stability guarantees
+
+The project is pre-1.0 and versions advance in `0.0.1` steps, in lockstep
+with the rest of the camt053 suite. The breaking axis is what an editor
+receives: the capabilities the server advertises, and the diagnostics,
+completion items, code actions, symbols and edits it returns, including the
+plain-dict shapes of the public helpers. A change to what the server
+reports for the same document is breaking even when no Python signature
+moves, and is called out in the [changelog](CHANGELOG.md). The Python floor
+moves only as described in the [toolchain policy](docs/POLICIES.md).
+
+---
 
 ## License
 
-Licensed under the [Apache License, Version 2.0][01]. Any contribution submitted
-for inclusion shall be licensed as above, without additional terms.
+This project is dual-licensed under either:
 
-## Contributing
+* Apache License, Version 2.0 ([`LICENSE-APACHE`](LICENSE-APACHE) or <https://www.apache.org/licenses/LICENSE-2.0>)
+* MIT License ([`LICENSE-MIT`](LICENSE-MIT) or <https://opensource.org/licenses/MIT>)
 
-Contributions are welcome — see the [contributing instructions][04]. Thanks to
-all [contributors][05].
+at your option. Any contribution submitted for inclusion is licensed the same
+way, without additional terms. Dependencies keep their own licences.
 
-## Acknowledgements
-
-Built on [pygls][pygls] and [lsprotocol][lsprotocol] by the
-[Open Law Library](https://github.com/openlawlibrary), and on the core
-[`camt053`][camt053] library that powers the shared service layer.
-
-[01]: https://opensource.org/license/apache-2-0/
-[04]: https://github.com/sebastienrousseau/camt053-lsp/blob/main/CONTRIBUTING.md
-[05]: https://github.com/sebastienrousseau/camt053-lsp/graphs/contributors
-[07]: https://pypi.org/project/camt053-lsp/
 [atheris]: https://github.com/google/atheris
+[bestpractices]: https://www.bestpractices.dev/projects/13375
 [camt053]: https://github.com/sebastienrousseau/camt053
-[lsp]: https://microsoft.github.io/language-server-protocol/
-[lsprotocol]: https://github.com/microsoft/lsprotocol
 [pygls]: https://github.com/openlawlibrary/pygls
-[release-0014]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.14
-[docs-badge]: https://img.shields.io/badge/Docs-camt053.com-blue?style=for-the-badge
-[docs-url]: https://sebastienrousseau.github.io/camt053/
-[license-badge]: https://img.shields.io/pypi/l/camt053-lsp?style=for-the-badge
-[pypi-badge]: https://img.shields.io/pypi/v/camt053-lsp?style=for-the-badge
-[python-versions-badge]: https://img.shields.io/pypi/pyversions/camt053-lsp.svg?style=for-the-badge
-[quality-badge]: https://img.shields.io/github/actions/workflow/status/sebastienrousseau/camt053-lsp/ci.yml?branch=main&label=Quality&style=for-the-badge
-[quality-url]: https://github.com/sebastienrousseau/camt053-lsp/actions/workflows/ci.yml
-[scorecard-badge]: https://api.scorecard.dev/projects/github.com/sebastienrousseau/camt053-lsp/badge?style=for-the-badge
-[scorecard-url]: https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/camt053-lsp
-[bestpractices-badge]: https://img.shields.io/cii/level/13375?label=OpenSSF%20Best%20Practices&style=for-the-badge
-[bestpractices-url]: https://www.bestpractices.dev/projects/13375
-[tests-badge]: https://img.shields.io/github/actions/workflow/status/sebastienrousseau/camt053-lsp/ci.yml?branch=main&label=Tests&style=for-the-badge
-[tests-url]: https://github.com/sebastienrousseau/camt053-lsp/actions/workflows/ci.yml
+[release]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.23

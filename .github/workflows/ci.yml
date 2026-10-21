@@ -19,16 +19,19 @@ jobs:
     name: Lockfile matches pyproject
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
-          cache: "pip"
 
-      - name: Install Poetry
-        run: pip install poetry
+      # requirements/build.txt pins poetry and its whole tree by hash, the
+      # same file the release job installs from.
+      - name: Install Poetry (hash-pinned)
+        run: pip install --require-hashes -r requirements/build.txt
 
       - name: Verify poetry.lock is current
         run: |
@@ -64,6 +67,12 @@ jobs:
       - name: Run tests
         run: python -m pytest tests/ -v --tb=short
 
+      # Perf tests are deselected by default; this one asserts a ratio
+      # (8x the input in under 20x the time), not a wall-clock threshold,
+      # so it is stable across runners. The quadratic JSONC pass gave ~50.
+      - name: Hold JSONC stripping linear
+        run: python -m pytest -m perf --no-cov tests/test_stress.py::test_strip_jsonc_scales_linearly
+
       # The benchmark asserts no timing threshold -- wall-clock is not
       # comparable between runners, and a flaky perf gate teaches
       # people to ignore red. This proves it still runs against the
@@ -93,10 +102,10 @@ jobs:
         run: pip install --require-hashes -r requirements/lint.txt
 
       - name: Ruff check
-        run: ruff check camt053_lsp/ tests/ benches/
+        run: ruff check camt053_lsp/ tests/ benches/ scripts/ fuzz/ examples/
 
       - name: Black check
-        run: black --check camt053_lsp/ tests/ benches/
+        run: black --check camt053_lsp/ tests/ benches/ scripts/ fuzz/ examples/
 
       - name: Mypy
         run: mypy camt053_lsp/
@@ -119,3 +128,64 @@ jobs:
 
       - name: Bandit
         run: bandit -r camt053_lsp/ -ll
+
+  # Per-function ceilings (cyclomatic 10, cognitive 15, Halstead 30,
+  # 60 lines; 500 lines per file) against complexity-baseline.json, which
+  # may only shrink.
+  complexity:
+    name: Complexity ceilings
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Install radon and complexipy (hash-pinned)
+        run: pip install --require-hashes -r requirements/complexity.txt
+
+      - name: Check complexity against the baseline
+        run: python scripts/check_complexity.py
+
+  # Dependency vulnerability audit, failing on any finding. Two halves: the
+  # environment `poetry install` resolves from poetry.lock (what a user
+  # gets, and where the anyio advisories sat), and every hash-pinned
+  # requirements/*.txt the other jobs install from (where the urllib3 and
+  # virtualenv advisories sat). A finding is fixed by constraining the
+  # dependency so no affected version can resolve.
+  audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry and pip-audit (hash-pinned)
+        run: |
+          pip install --require-hashes -r requirements/build.txt
+          pip install --require-hashes -r requirements/audit.txt
+
+      - name: Install the locked environment
+        run: poetry install --no-interaction --no-root
+
+      # pip-audit audits the interpreter it runs under unless told
+      # otherwise; point it at the Poetry environment's.
+      - name: Audit poetry.lock
+        run: PIPAPI_PYTHON_LOCATION="$(poetry env info -p)/bin/python" pip-audit --desc
+
+      - name: Audit requirements/*.txt
+        run: |
+          for f in requirements/*.txt; do
+            echo "== $f"
+            pip-audit --require-hashes --disable-pip --desc -r "$f"
+          done

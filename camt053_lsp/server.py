@@ -82,6 +82,7 @@ from lsprotocol import types as lsp
 from pygls.lsp.server import LanguageServer
 
 from . import __version__
+from ._jsonc import strip_jsonc as _strip_jsonc
 
 DEFAULT_MESSAGE_TYPE = "camt.053.001.14"
 
@@ -97,79 +98,6 @@ _IDENTIFIER_FIELDS = {
 # ---------------------------------------------------------------------------
 # Pure helpers (no LSP/server I/O - directly unit-testable)
 # ---------------------------------------------------------------------------
-def _strip_jsonc(text: str) -> str:
-    """Strip JSONC sugar (``//`` line comments, trailing commas) to plain JSON.
-
-    A dependency-free pre-step so JSONC data files parse with the standard
-    library. ``//`` only starts a comment outside of strings; ``"`` quoting and
-    backslash escapes are tracked so comment markers and commas inside string
-    values are preserved. Clean JSON is returned unchanged in substance (only
-    superfluous trailing commas / comments are removed).
-
-    Args:
-        text: The raw (possibly JSONC) document text.
-
-    Returns:
-        The text with line comments removed and trailing commas dropped.
-    """
-    out: list[str] = []
-    in_string = False
-    escaped = False
-    i = 0
-    length = len(text)
-    while i < length:
-        ch = text[i]
-        if in_string:
-            out.append(ch)
-            if escaped:
-                escaped = False
-            elif ch == "\\":
-                escaped = True
-            elif ch == '"':
-                in_string = False
-            i += 1
-            continue
-        if ch == '"':
-            in_string = True
-            out.append(ch)
-            i += 1
-            continue
-        if ch == "/" and i + 1 < length and text[i + 1] == "/":
-            # Skip to (but keep) the end-of-line.
-            while i < length and text[i] != "\n":
-                i += 1
-            continue
-        out.append(ch)
-        i += 1
-
-    stripped = "".join(out)
-    # Drop trailing commas that immediately precede a closing ``}`` or ``]``
-    # (optionally separated by whitespace), again only outside of strings.
-    result: list[str] = []
-    in_string = False
-    escaped = False
-    for idx, ch in enumerate(stripped):
-        if in_string:
-            result.append(ch)
-            if escaped:
-                escaped = False
-            elif ch == "\\":
-                escaped = True
-            elif ch == '"':
-                in_string = False
-            continue
-        if ch == '"':
-            in_string = True
-            result.append(ch)
-            continue
-        if ch == ",":
-            rest = stripped[idx + 1 :]
-            if rest.lstrip()[:1] in ("}", "]"):
-                continue
-        result.append(ch)
-    return "".join(result)
-
-
 def _loads_tolerant(text: str) -> Any:
     """Parse ``text`` as JSON, tolerating JSONC comments and trailing commas.
 
