@@ -26,6 +26,10 @@ family carries.
   **virtualenv at 21.7.13** (GHSA-gh4c-6fx4-qh6g, GHSA-8988-9cw3-xx77,
   GHSA-vxq7-64xx-v4gw; GHSA-94p9-xgh2-xp45, GHSA-9h9j-4vrj-gf7g,
   GHSA-x78j-v8h9-3j2q, GHSA-p58f-9548-mpm2).
+- **certifi 2026.10.19** everywhere it resolves (GHSA-6q48-6c7w-9gw2,
+  compromised emSign ECC Root CA - G3 intermediates): floored in the
+  build tooling, and through `camt053` 0.0.23 in the lock and the test,
+  fuzz and lint requirements.
 - `scripts/check_suite_consistency.py` compares this tree with
   camt053-lsp's own release (the shared copy, with `THIS`), so the window
   between the core's tag and this one no longer reports a false mismatch.
