@@ -203,34 +203,42 @@ uvloop = ["uvloop (>=0.15.2) ; sys_platform != \"win32\"", "winloop (>=0.5.0) ; 
 
 [[package]]
 name = "camt053"
-version = "0.0.20"
+version = "0.0.23"
 description = "Camt053 is a Python library for reading ISO 20022 camt Bank-to-Customer Statements (camt.053/052/054) and generating validated reversing entries by return reason code (e.g. AC04 Closed Account)."
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "camt053-0.0.20-py3-none-any.whl", hash = "sha256:22e89754463d00373a50efd24123e77ccc34ff1ebd9e9608902ee133f66ca9ec"},
-    {file = "camt053-0.0.20.tar.gz", hash = "sha256:1f3bf89f3b69184d78d331a354b9537a38f2237a4daa52c520fa6ab57f16dc78"},
+    {file = "camt053-0.0.23-py3-none-any.whl", hash = "sha256:390edeaba1c7915d1b7237c38ef47a3f1a540e714f1260cce6f9422491fd7f78"},
+    {file = "camt053-0.0.23.tar.gz", hash = "sha256:4f37f08cfb0d3febe5eedb92660a7ebe2087fd4c8baf5fa9808c4ad4f8cefc90"},
 ]
 
 [package.dependencies]
+anyio = ">=4.14.2,<5"
+certifi = ">=2026.10.19"
 click = ">=8.1,<9"
 colorama = "0.4.6"
-cryptography = ">=48.0.1,<51.0.0"
+cryptography = ">=50.0.0,<51.0.0"
 defusedxml = "0.7.1"
-fastapi = ">=0.95"
-httpx = ">=0.23"
+fastapi = ">=0.109.1,<1"
+h11 = ">=0.16.0,<1"
+httpx = ">=0.23,<1"
+idna = ">=3.15,<4"
 jinja2 = "3.1.6"
 jsonschema = ">=4.20,<4.27"
 markupsafe = ">=2.1,<4"
+pydantic = ">=2.4.0,<3"
 pygments = ">=2.20.0,<3.0.0"
+python-dotenv = ">=1.2.2,<2"
+pyyaml = ">=5.4,<7"
 rich = ">=13.7.1,<16"
-uvicorn = {version = ">=0.20", extras = ["standard"]}
+starlette = ">=1.3.1,<2"
+uvicorn = {version = ">=0.20,<1", extras = ["standard"]}
 xmlschema = ">=4.3.2,<5.0.0"
 
 [package.extras]
-fast = ["lxml (>=5.0,<7)"]
-telemetry = ["opentelemetry-api (>=1.20)"]
+fast = ["lxml (>=6.1.0,<7)"]
+telemetry = ["opentelemetry-api (>=1.20,<2)"]
 
 [[package]]
 name = "cattrs"
@@ -262,14 +270,14 @@ ujson = ["ujson (>=5.10.0)"]
 
 [[package]]
 name = "certifi"
-version = "2026.6.17"
+version = "2026.10.19"
 description = "Python package for providing Mozilla's CA Bundle."
 optional = false
 python-versions = ">=3.7"
 groups = ["main"]
 files = [
-    {file = "certifi-2026.6.17-py3-none-any.whl", hash = "sha256:2227dcbaafe0d2f59279d1762ddddc37783ed4354594f194ffc31d20f41fc3db"},
-    {file = "certifi-2026.6.17.tar.gz", hash = "sha256:024c88eeec92ca068db80f02b8b07c9cef7b9fe261d1d535abfd5abd6f6af432"},
+    {file = "certifi-2026.10.19-py3-none-any.whl", hash = "sha256:42d35340cc5b9ba78e818ddbff0c5b1c2b779de448a340fd1b989f5fa8670e1b"},
+    {file = "certifi-2026.10.19.tar.gz", hash = "sha256:035c1e85572b141bf1c3a3eff0e33a8eb74917522f2559075ff8d2fea780a1ae"},
 ]
 
 [[package]]
@@ -2358,25 +2366,11 @@ files = [
 
 [[package]]
 name = "typing-extensions"
-version = "4.15.0"
-description = "Backported and Experimental Type Hints for Python 3.9+"
-optional = false
-python-versions = ">=3.9"
-groups = ["main", "dev"]
-markers = "python_version >= \"3.15\""
-files = [
-    {file = "typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548"},
-    {file = "typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466"},
-]
-
-[[package]]
-name = "typing-extensions"
 version = "4.16.0"
 description = "Backported and Experimental Type Hints for Python 3.9+"
 optional = false
 python-versions = ">=3.9"
 groups = ["main", "dev"]
-markers = "python_version < \"3.15\""
 files = [
     {file = "typing_extensions-4.16.0-py3-none-any.whl", hash = "sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"},
     {file = "typing_extensions-4.16.0.tar.gz", hash = "sha256:dc983d19a509c94dba722ee6abd33940f7c05a89e243c47e907eb4db6f1a43e5"},
@@ -2703,4 +2697,4 @@ docs = ["jinja2", "sphinx", "sphinx_rtd_theme"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "211a56ecdf2a2f6e50d7f5bdf721db7ee61ca89f114679d565d72efd1269ce03"
+content-hash = "bcc30cd2644c343786c9566428b99645d6441250e9c3f4accfaae547cec68a01"
