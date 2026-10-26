@@ -1,6 +1,12 @@
 # Dependency vulnerability scanner for the CI "audit" job.
+# Installed only by that job, on Python 3.12, so it is compiled for 3.12
+# (see the Makefile).
 pip-audit
 # Advisory floors (Dependabot alerts): pip GHSA-qwm4-qh6w-59xr,
 # urllib3 GHSA-vxq7-64xx-v4gw and GHSA-gh4c-6fx4-qh6g.
 pip>=26.2
 urllib3>=2.8.0
+# filelock (through cachecontrol) <= 4.2.0: GHSA-9vhv-jxww-xfm5,
+# GHSA-567q-5qvw-pf92 and GHSA-v4x8-3wr5-3wq8, fixed in 4.2.1, which
+# needs Python 3.11.
+filelock>=4.2.1
