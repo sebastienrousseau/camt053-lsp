@@ -8,5 +8,5 @@ twine
 # certifi: GHSA-6q48-6c7w-9gw2 (compromised emSign ECC Root CA - G3
 # intermediates), fixed in 2026.10.19.
 urllib3>=2.8.0
-virtualenv>=21.7.13
-certifi>=2026.10.19
+virtualenv>=21.14.13
+certifi>=2026.10.23
