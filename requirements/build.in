@@ -1,4 +1,6 @@
 # Build/publish tooling for the release "publish" + "sbom" jobs.
+# Every job that installs it runs on Python 3.12, so it is compiled for 3.12
+# (see the Makefile): filelock 4.2.1, the fix below, needs 3.11.
 poetry
 twine
 # Transitive through poetry and twine; constrained so no advised version
@@ -8,5 +10,10 @@ twine
 # certifi: GHSA-6q48-6c7w-9gw2 (compromised emSign ECC Root CA - G3
 # intermediates), fixed in 2026.10.19.
 urllib3>=2.8.0
-virtualenv>=21.7.13
+# virtualenv GHSA-cx6f-vjhg-g3cc (21.14.9 to 21.14.12: the bash activator
+# leaves --prompt unescaped in PS1), fixed in 21.14.13.
+virtualenv>=21.14.13
 certifi>=2026.10.19
+# filelock <= 4.2.0: GHSA-9vhv-jxww-xfm5, GHSA-567q-5qvw-pf92 and
+# GHSA-v4x8-3wr5-3wq8, fixed in 4.2.1.
+filelock>=4.2.1
