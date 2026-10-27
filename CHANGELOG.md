@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Security
+
+- `requirements/build.txt` floors `filelock >= 4.2.1` (GHSA-9vhv-jxww-xfm5,
+  GHSA-567q-5qvw-pf92, GHSA-v4x8-3wr5-3wq8; it pinned 3.32.3) and
+  `virtualenv >= 21.14.13` (GHSA-cx6f-vjhg-g3cc; it pinned 21.14.11), and
+  `requirements/audit.txt` floors `filelock >= 4.2.1` (it pinned 4.1.0 on
+  Python 3.10). filelock 4.2.1 needs Python 3.11, and only Python 3.12
+  jobs install these two trees, so `make pip-compile` compiles them for
+  3.12 and every other tree for 3.10 as before.
+
+### Changed
+
+- `requirements/lint.in` pins ruff 0.17.2.
+
 ## [0.0.23] - 2026-10-20
 
 The camt053 suite's 0.0.23 release, core first. For this server: JSONC
