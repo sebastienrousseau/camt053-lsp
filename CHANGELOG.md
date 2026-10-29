@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.25] - 2026-10-29
+
+The camt053 suite's 0.0.25 release, core first. The suite moves
+together because camt053-mcp takes a development-tool update
+(Dependabot #147: pytest-asyncio 1.4.1, complexipy); what the
+server returns for a document is unchanged.
+
+### Changed
+
+- Requires `camt053 >= 0.0.25, < 1` in `pyproject.toml` and
+  `requirements/{fuzz,lint,test}.in`, and the hash-pinned
+  requirement files pin the published camt053 0.0.25.
+
 ## [0.0.24] - 2026-10-29
 
 The camt053 suite's 0.0.24 release, core first. Every member drops
@@ -459,6 +472,7 @@ Part of the v0.0.6 batch tracked in #16.
 - Part of the **camt053 suite** alongside the core `camt053` library and the
   `camt053-mcp` Model Context Protocol server
 
+[0.0.25]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.25
 [0.0.24]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.24
 [0.0.23]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.23
 [0.0.20]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.20

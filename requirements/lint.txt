@@ -114,9 +114,9 @@ black==26.10.1 \
     --hash=sha256:fe85fc4019bee59bc495c0f2a8ee76c5cd02c7015508d94a967ba2376f39a52c \
     --hash=sha256:ff57f63029aa1353fa8b1b0c8971fd88a6c92dc766608d2eee33ad2deb23270e
     # via -r requirements/lint.in
-camt053==0.0.24 \
-    --hash=sha256:38328f1062fc239b6146f440432b69d4eedb1b86f196e417e83a7c39f4d58bf9 \
-    --hash=sha256:f9a353818ebdc6db7e8cb04c72ec73250f9a6a50697cc4e444dd28350a51e78d
+camt053==0.0.25 \
+    --hash=sha256:2b4167193f6b0fdbf5d3256142389145a72f2bf7f1420315e0fa5b23d8be90e1 \
+    --hash=sha256:c58527620cd37fd78e1cb3a003d694e004ccbf8dd91cd91e4356a255abf6d628
     # via -r requirements/lint.in
 cattrs==26.1.0 \
     --hash=sha256:d1e0804c42639494d469d08d4f26d6b9de9b8ab26b446db7b5f8c2e97f7c3096 \
