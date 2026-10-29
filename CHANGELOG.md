@@ -24,6 +24,12 @@ document is unchanged.
 
 ### Security
 
+- `msgpack >= 1.2.3` (GHSA-j586-36cw-2gc2, CVE-2026-114613, high) in
+  `requirements/build.in` and `audit.in`, where it arrives through
+  cachecontrol: the C extension leaks a rejected map value and its
+  streaming `Unpacker` can drop a stale reference. `build.txt` pinned
+  1.2.1. The advisory was published after camt053-lsp 0.0.23 and has
+  no Dependabot alert here, so `pip-audit` found it.
 - `requirements/build.txt` floors `filelock >= 4.2.1` (GHSA-9vhv-jxww-xfm5,
   GHSA-567q-5qvw-pf92, GHSA-v4x8-3wr5-3wq8; it pinned 3.32.3) and
   `virtualenv >= 21.14.13` (GHSA-cx6f-vjhg-g3cc; it pinned 21.14.11), and
