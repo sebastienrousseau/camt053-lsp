@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.0.24] - 2026-10-29
+
+The camt053 suite's 0.0.24 release, core first. Every member drops
+Python 3.10 and requires the 0.0.24 core. What the server returns for a
+document is unchanged.
 
 ### Removed
 
@@ -449,6 +453,7 @@ Part of the v0.0.6 batch tracked in #16.
 - Part of the **camt053 suite** alongside the core `camt053` library and the
   `camt053-mcp` Model Context Protocol server
 
+[0.0.24]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.24
 [0.0.23]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.23
 [0.0.20]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.20
 [0.0.18]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.18

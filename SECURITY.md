@@ -8,14 +8,15 @@ authoring reversing-entry data.
 
 ## Supported Versions
 
-Security fixes are applied to the latest released minor version. While the
-project is in its `0.0.x` series, only the most recent release line receives
+Security fixes are applied to the latest release and the one before it.
+While the project is in its `0.0.x` series, older releases receive no
 security updates.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 0.0.23  | :white_check_mark: |
-| < 0.0.23 | :x:               |
+| Version  | Supported          | Status |
+| -------- | ------------------ | ------ |
+| 0.0.24   | :white_check_mark: | Latest |
+| 0.0.23   | :white_check_mark: | Prior  |
+| < 0.0.23 | :x:                |        |
 
 ## Reporting a Vulnerability
 

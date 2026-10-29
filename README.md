@@ -67,11 +67,10 @@
 python -m pip install camt053-lsp
 ```
 
-> **Latest release: v0.0.23**: JSONC stripping in linear time (a 1.2 MB
-> document took 3.2 s per change), the camt053 0.0.23 floor, anyio
-> 4.14.2 or newer, and complexity, version and dependency-audit gates in
-> CI. Schema and IBAN/BIC diagnostics, completion, hover, code actions,
-> document symbols and formatting, all backed by `camt053.services`.
+> **Latest release: v0.0.24**: Python 3.11 or newer, released in
+> lockstep with the camt053 suite at 0.0.24. The diagnostics, completion,
+> hover, code actions, document symbols and formatting it returns are
+> unchanged from 0.0.23, all backed by `camt053.services`.
 > [See what's new →][release]
 
 The package installs a `camt053-lsp` console command and pulls in the core
@@ -383,4 +382,4 @@ way, without additional terms. Dependencies keep their own licences.
 [bestpractices]: https://www.bestpractices.dev/projects/13375
 [camt053]: https://github.com/sebastienrousseau/camt053
 [pygls]: https://github.com/openlawlibrary/pygls
-[release]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.23
+[release]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.24
