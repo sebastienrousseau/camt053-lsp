@@ -86,7 +86,7 @@ the concrete control(s) that implement it in this repo.
 | :--- | :--- |
 | **PO.1** Define security requirements | This `SECURITY.md`, plus the in-scope/out-of-scope sections above. |
 | **PO.3** Implement supporting toolchains | `pyproject.toml`; `.github/workflows/ci.yml` (test + lint + security scan); `.github/workflows/scorecard.yml`. |
-| **PO.4** Define and use criteria for software security checks | CI enforces tests on Python 3.10 to 3.14, ruff lint, black formatting, mypy, bandit security scan, interrogate docstring coverage, per-function complexity ceilings and version-source agreement; Scorecard runs weekly. |
+| **PO.4** Define and use criteria for software security checks | CI enforces tests on Python 3.11 to 3.14, ruff lint, black formatting, mypy, bandit security scan, interrogate docstring coverage, per-function complexity ceilings and version-source agreement; Scorecard runs weekly. |
 | **PO.5** Implement and maintain secure environments | PyPI Trusted Publishing (OIDC, no long-lived tokens); branch protection + signed commits on `main`; per-workflow `permissions:` minimisation. |
 | **PS.1** Protect all forms of code from unauthorized access and tampering | Signed commits (SSH ed25519); branch protection on `main` (signed commits, linear history, required status checks, enforced for admins); `persist-credentials: false` on every checkout. |
 | **PS.2** Provide a mechanism for verifying software release integrity | Signed git tags; `actions/attest-build-provenance@v3` SLSA L3 provenance attestations; PEP 740 sigstore attestations on PyPI uploads (`pypa/gh-action-pypi-publish` with `attestations: true`). |
@@ -96,7 +96,7 @@ the concrete control(s) that implement it in this repo.
 | **PW.5** Adhere to secure coding practices | `ruff`, `bandit -ll`, strict `mypy`, code review on every PR. |
 | **PW.6** Configure build processes to improve security | Reproducible builds via `python -m build` / `poetry build` with locked dependencies; CI uses pinned action versions; minimum-required GH Actions permissions. |
 | **PW.7** Review and analyze human-readable code | All changes go through PRs; CodeQL static analysis runs on push/PR; ruff + mypy + bandit on every change. With one maintainer there is no second reviewer (see Code-Review below). |
-| **PW.8** Test executable code | pytest across Python 3.10 to 3.14; per-capability runnable examples auto-exercised in CI via `tests/test_examples.py`. |
+| **PW.8** Test executable code | pytest across Python 3.11 to 3.14; per-capability runnable examples auto-exercised in CI via `tests/test_examples.py`. |
 | **PW.9** Configure software with secure defaults | Stdio transport binds to the local process owner only (no network listener); JSONC tolerance is purely syntactic (strips `//` line comments and trailing commas — no JSONC-specific code execution). |
 | **RV.1** Identify and confirm vulnerabilities on an ongoing basis | Dependabot daily; `bandit` in CI; OpenSSF Scorecard weekly; GitHub Security Advisories accept reports. |
 | **RV.2** Assess, prioritise, and remediate vulnerabilities | Coordinated-disclosure timeline above (3-day ack / 7-day assessment / 30-day fix); CHANGELOG + advisory at fix publication. |

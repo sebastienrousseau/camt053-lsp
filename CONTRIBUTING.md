@@ -8,7 +8,7 @@ suite. This guide covers the development workflow and standards.
 
 ### Prerequisites
 
-- Python 3.10+
+- Python 3.11+
 - [Poetry](https://python-poetry.org/docs/#installation)
 - Git with SSH commit signing configured
 
@@ -137,9 +137,10 @@ All changes land through pull requests and are reviewed before release:
 
 - **Every change is a pull request** against `main`; direct pushes are
   blocked by branch protection.
-- **`main` is protected** — required status checks (tests on Python
-  3.10–3.12, lint, type-check, security scan, CodeQL) must pass, the branch
-  must be up to date, and force-pushes and deletions are disabled.
+- **`main` is protected** — the required status checks (lint and type
+  check, security scan, CodeQL) must pass, commits must be signed, and
+  force-pushes and deletions are disabled. The CI test matrix (Python 3.11
+  to 3.14) runs on every pull request as well.
 - **A maintainer reviews each PR** before merging, checking for: tests
   covering new behaviour, no drop in coverage, no new linter or type errors,
   signed commits, and a conventional-commit title. Security-sensitive changes

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **Python 3.10 is no longer supported; the floor is 3.11.** This is a
+  decision for the whole camt053 suite: 3.10 reaches end of life in
+  October 2026, and current Hypothesis releases need 3.11. The CI matrix
+  is 3.11 to 3.14, ruff, black and mypy target 3.11, the `tomli`
+  backport and the 3.10 `tomllib` fallback in
+  `scripts/check_suite_consistency.py` are gone, and `poetry.lock` and
+  every hash-pinned `requirements/*.txt` are resolved for 3.11. On 3.10,
+  pip keeps resolving 0.0.23.
+
 ### Security
 
 - `requirements/build.txt` floors `filelock >= 4.2.1` (GHSA-9vhv-jxww-xfm5,
@@ -15,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `requirements/audit.txt` floors `filelock >= 4.2.1` (it pinned 4.1.0 on
   Python 3.10). filelock 4.2.1 needs Python 3.11, and only Python 3.12
   jobs install these two trees, so `make pip-compile` compiles them for
-  3.12 and every other tree for 3.10 as before.
+  3.12 and every other tree for the 3.11 floor.
 
 ### Changed
 

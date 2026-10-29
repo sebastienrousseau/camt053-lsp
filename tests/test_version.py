@@ -19,26 +19,24 @@ Ensures ``camt053_lsp.__version__`` stays in lock-step with the packaged
 ``pyproject.toml`` version, so the version announced to LSP clients and the
 published package never drift apart again.
 
-The ``pyproject.toml`` version is read with a regex on the file text rather
-than ``tomllib`` because Python 3.10 (which lacks ``tomllib``) is part of the
-CI matrix.
+The ``pyproject.toml`` version is read with ``tomllib``, which is in the
+standard library on every supported Python (3.11 and newer).
 """
 
-import re
+import tomllib
 from pathlib import Path
 
 import camt053_lsp
 
 _PYPROJECT = Path(__file__).resolve().parent.parent / "pyproject.toml"
-_VERSION_RE = re.compile(r'(?m)^version\s*=\s*"([^"]+)"')
 
 
 def _pyproject_version() -> str:
-    """Extract the ``version`` string from ``pyproject.toml`` via regex."""
-    text = _PYPROJECT.read_text(encoding="utf-8")
-    match = _VERSION_RE.search(text)
-    assert match is not None, "no version string found in pyproject.toml"
-    return match.group(1)
+    """Return ``[tool.poetry] version`` from ``pyproject.toml``."""
+    with _PYPROJECT.open("rb") as handle:
+        version = tomllib.load(handle)["tool"]["poetry"]["version"]
+    assert isinstance(version, str), "no version string in pyproject.toml"
+    return version
 
 
 def test_version_matches_pyproject() -> None:
