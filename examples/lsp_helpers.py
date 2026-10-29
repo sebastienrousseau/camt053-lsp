@@ -5,7 +5,7 @@
 """Example: the LSP server's editor-feature helpers.
 
 Usage:
-    pip install camt053-lsp     # requires Python 3.10+
+    pip install camt053-lsp     # requires Python 3.11+
     python examples/lsp_helpers.py
 
 The camt053 language server (launched as `camt053-lsp` over stdio) powers

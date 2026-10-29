@@ -17,7 +17,7 @@
   <a href="https://sebastienrousseau.github.io/camt053/"><img src="https://img.shields.io/badge/docs-camt053-blue?style=for-the-badge&labelColor=555555&logo=readthedocs" alt="Docs" height="28" /></a>
   <a href="https://scorecard.dev/viewer/?uri=github.com/sebastienrousseau/camt053-lsp"><img src="https://img.shields.io/ossf-scorecard/github.com/sebastienrousseau/camt053-lsp?style=for-the-badge&label=OpenSSF%20Scorecard&logo=openssf" alt="OpenSSF Scorecard" height="28" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0%20OR%20MIT-blue.svg?style=for-the-badge" alt="License: Apache-2.0 OR MIT" height="28" /></a>
-  <a href="https://github.com/sebastienrousseau/camt053-lsp/blob/main/docs/POLICIES.md"><img src="https://img.shields.io/badge/Python-3.10%2B-93450a.svg?style=for-the-badge&logo=python" alt="Python 3.10 or newer" height="28" /></a>
+  <a href="https://github.com/sebastienrousseau/camt053-lsp/blob/main/docs/POLICIES.md"><img src="https://img.shields.io/badge/Python-3.11%2B-93450a.svg?style=for-the-badge&logo=python" alt="Python 3.11 or newer" height="28" /></a>
   <a href="https://www.bestpractices.dev/projects/13375"><img src="https://img.shields.io/cii/level/13375?style=for-the-badge&label=OpenSSF%20Best%20Practices&logo=openssf" alt="OpenSSF Best Practices" height="28" /></a>
 </p>
 
@@ -67,11 +67,10 @@
 python -m pip install camt053-lsp
 ```
 
-> **Latest release: v0.0.23**: JSONC stripping in linear time (a 1.2 MB
-> document took 3.2 s per change), the camt053 0.0.23 floor, anyio
-> 4.14.2 or newer, and complexity, version and dependency-audit gates in
-> CI. Schema and IBAN/BIC diagnostics, completion, hover, code actions,
-> document symbols and formatting, all backed by `camt053.services`.
+> **Latest release: v0.0.24**: Python 3.11 or newer, released in
+> lockstep with the camt053 suite at 0.0.24. The diagnostics, completion,
+> hover, code actions, document symbols and formatting it returns are
+> unchanged from 0.0.23, all backed by `camt053.services`.
 > [See what's new →][release]
 
 The package installs a `camt053-lsp` console command and pulls in the core
@@ -93,10 +92,10 @@ camt053-lsp --version
 
 ## Requirements
 
-- Python 3.10 or newer, tested in CI on 3.10, 3.11, 3.12, 3.13 and 3.14 on
+- Python 3.11 or newer, tested in CI on 3.11, 3.12, 3.13 and 3.14 on
   Linux ([toolchain policy](docs/POLICIES.md)). The package is pure Python
   and runs wherever its dependencies do: macOS, Linux and Windows.
-- `camt053` 0.0.23 or newer (below 1.0) and `pygls` 1.3 or newer, installed
+- `camt053` 0.0.24 or newer (below 1.0) and `pygls` 1.3 or newer, installed
   automatically.
 - `anyio` 4.14.2 or newer: earlier releases are affected by
   GHSA-3w57-8xmc-8v26, GHSA-5p39-cfhj-2xmp and GHSA-82r6-8w77-94w6 and cannot
@@ -320,7 +319,7 @@ make demo          # re-render .github/demo.gif with VHS
 
 CI installs from hash-pinned `requirements/*.txt` (compiled from
 `requirements/*.in` with `uv pip compile --generate-hashes`) and runs the
-test matrix on Python 3.10 to 3.14, ruff, black, mypy in strict mode,
+test matrix on Python 3.11 to 3.14, ruff, black, mypy in strict mode,
 bandit, interrogate (100% docstrings), the complexity ceilings, the
 version-source check, CodeQL, OpenSSF Scorecard and ClusterFuzzLite. See
 [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`docs/RELEASING.md`](docs/RELEASING.md).
@@ -383,4 +382,4 @@ way, without additional terms. Dependencies keep their own licences.
 [bestpractices]: https://www.bestpractices.dev/projects/13375
 [camt053]: https://github.com/sebastienrousseau/camt053
 [pygls]: https://github.com/openlawlibrary/pygls
-[release]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.23
+[release]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.24

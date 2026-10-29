@@ -6,7 +6,7 @@ tutorial for `camt053-lsp`.
 ## 1. Install
 
 `camt053-lsp` runs on macOS, Linux, and Windows and requires Python
-3.10+. It pulls in the core `camt053` library and `pygls`
+3.11+. It pulls in the core `camt053` library and `pygls`
 automatically.
 
 ```sh

@@ -28,7 +28,7 @@ executed end-to-end by the test suite (`tests/test_examples.py`), so the
 examples stay in lockstep with the code.
 
 Both `camt053-lsp` and its core dependency `camt053` must be installed
-(Python 3.10+):
+(Python 3.11+):
 
 ```sh
 pip install camt053-lsp

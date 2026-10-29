@@ -5,17 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.0.24] - 2026-10-29
+
+The camt053 suite's 0.0.24 release, core first. Every member drops
+Python 3.10 and requires the 0.0.24 core. What the server returns for a
+document is unchanged.
+
+### Removed
+
+- **Python 3.10 is no longer supported; the floor is 3.11.** This is a
+  decision for the whole camt053 suite: 3.10 reaches end of life in
+  October 2026, and current Hypothesis releases need 3.11. The CI matrix
+  is 3.11 to 3.14, ruff, black and mypy target 3.11, the `tomli`
+  backport and the 3.10 `tomllib` fallback in
+  `scripts/check_suite_consistency.py` are gone, and `poetry.lock` and
+  every hash-pinned `requirements/*.txt` are resolved for 3.11. On 3.10,
+  pip keeps resolving 0.0.23.
 
 ### Security
 
+- `msgpack >= 1.2.3` (GHSA-j586-36cw-2gc2, CVE-2026-114613, high) in
+  `requirements/build.in` and `audit.in`, where it arrives through
+  cachecontrol: the C extension leaks a rejected map value and its
+  streaming `Unpacker` can drop a stale reference. `build.txt` pinned
+  1.2.1. The advisory was published after camt053-lsp 0.0.23 and has
+  no Dependabot alert here, so `pip-audit` found it.
 - `requirements/build.txt` floors `filelock >= 4.2.1` (GHSA-9vhv-jxww-xfm5,
   GHSA-567q-5qvw-pf92, GHSA-v4x8-3wr5-3wq8; it pinned 3.32.3) and
   `virtualenv >= 21.14.13` (GHSA-cx6f-vjhg-g3cc; it pinned 21.14.11), and
   `requirements/audit.txt` floors `filelock >= 4.2.1` (it pinned 4.1.0 on
   Python 3.10). filelock 4.2.1 needs Python 3.11, and only Python 3.12
   jobs install these two trees, so `make pip-compile` compiles them for
-  3.12 and every other tree for 3.10 as before.
+  3.12 and every other tree for the 3.11 floor.
 
 ### Changed
 
@@ -438,6 +459,7 @@ Part of the v0.0.6 batch tracked in #16.
 - Part of the **camt053 suite** alongside the core `camt053` library and the
   `camt053-mcp` Model Context Protocol server
 
+[0.0.24]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.24
 [0.0.23]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.23
 [0.0.20]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.20
 [0.0.18]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.18

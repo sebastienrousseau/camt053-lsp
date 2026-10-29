@@ -11,7 +11,7 @@ reversing-entry data files. Diagnostics, completion, hover, code-actions,
 document-symbols, formatting; pure helpers behind every capability so the
 same logic powers tests and downstream tooling.
 
-## Where we are (v0.0.23, 2026-10-20)
+## Where we are (v0.0.24, 2026-10-29)
 
 - **7 LSP capabilities** with pure-helper backings:
   - **Diagnostics**: `compute_diagnostics` (JSON record validation,
