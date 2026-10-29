@@ -67,10 +67,10 @@
 python -m pip install camt053-lsp
 ```
 
-> **Latest release: v0.0.24**: Python 3.11 or newer, released in
-> lockstep with the camt053 suite at 0.0.24. The diagnostics, completion,
-> hover, code actions, document symbols and formatting it returns are
-> unchanged from 0.0.23, all backed by `camt053.services`.
+> **Latest release: v0.0.25**: released in lockstep with the camt053
+> suite at 0.0.25. The diagnostics, completion, hover, code actions,
+> document symbols and formatting it returns are unchanged from 0.0.24,
+> all backed by `camt053.services`.
 > [See what's new →][release]
 
 The package installs a `camt053-lsp` console command and pulls in the core
@@ -382,4 +382,4 @@ way, without additional terms. Dependencies keep their own licences.
 [bestpractices]: https://www.bestpractices.dev/projects/13375
 [camt053]: https://github.com/sebastienrousseau/camt053
 [pygls]: https://github.com/openlawlibrary/pygls
-[release]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.24
+[release]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.25
