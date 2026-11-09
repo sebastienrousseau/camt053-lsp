@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.26] - 2026-11-09
+
+The camt053 suite's 0.0.26 release, core first. What the server
+returns for a document is unchanged. camt053 0.0.26 moves its REST
+stack into a `camt053[api]` extra; this server never imports
+`camt053.api`, so it keeps depending on plain `camt053`.
+
+### Changed
+
+- No longer declares `anyio`, which it never imports: camt053 0.0.25
+  already floors it at 4.14.2, and from camt053 0.0.26 nothing in this
+  server's tree needs it.
+- `poetry.lock` drops 21 packages nothing depends on (cyclonedx-bom
+  and its tree), which an earlier Dependabot fold had left in it.
+- Development tools from the python-dependencies group (#119), and a
+  stable `<job> (all)` required check after each versioned test matrix
+  (#118).
+
 ## [0.0.25] - 2026-10-29
 
 The camt053 suite's 0.0.25 release, core first. The suite moves
@@ -472,6 +490,7 @@ Part of the v0.0.6 batch tracked in #16.
 - Part of the **camt053 suite** alongside the core `camt053` library and the
   `camt053-mcp` Model Context Protocol server
 
+[0.0.26]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.26
 [0.0.25]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.25
 [0.0.24]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.24
 [0.0.23]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.23

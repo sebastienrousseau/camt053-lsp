@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "camt053-lsp"
-version = "0.0.25"
+version = "0.0.26"
 description = "Language Server Protocol (LSP) server for authoring camt053 ISO 20022 camt.053 reversing-entry data files."
 authors = ["Sebastien Rousseau <sebastian.rousseau@gmail.com>"]
 license = "Apache-2.0 OR MIT"
@@ -16,13 +16,8 @@ camt053-lsp = "camt053_lsp.server:main"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<4.0"
-camt053 = ">=0.0.25,<1"
+camt053 = ">=0.0.26,<1"
 pygls = ">=1.3"
-# Not imported here; reached through camt053 (httpx, starlette). Every
-# release before 4.14.2 is affected by GHSA-3w57-8xmc-8v26,
-# GHSA-5p39-cfhj-2xmp and GHSA-82r6-8w77-94w6, so none may resolve. The
-# <5 cap matches the camt053 core.
-anyio = ">=4.14.2,<5"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=9.0.3,<10.0.0"

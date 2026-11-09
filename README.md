@@ -67,9 +67,9 @@
 python -m pip install camt053-lsp
 ```
 
-> **Latest release: v0.0.25**: released in lockstep with the camt053
-> suite at 0.0.25. The diagnostics, completion, hover, code actions,
-> document symbols and formatting it returns are unchanged from 0.0.24,
+> **Latest release: v0.0.26**: released in lockstep with the camt053
+> suite at 0.0.26. The diagnostics, completion, hover, code actions,
+> document symbols and formatting it returns are unchanged from 0.0.25,
 > all backed by `camt053.services`.
 > [See what's new →][release]
 
@@ -95,11 +95,8 @@ camt053-lsp --version
 - Python 3.11 or newer, tested in CI on 3.11, 3.12, 3.13 and 3.14 on
   Linux ([toolchain policy](docs/POLICIES.md)). The package is pure Python
   and runs wherever its dependencies do: macOS, Linux and Windows.
-- `camt053` 0.0.25 or newer (below 1.0) and `pygls` 1.3 or newer, installed
+- `camt053` 0.0.26 or newer (below 1.0) and `pygls` 1.3 or newer, installed
   automatically.
-- `anyio` 4.14.2 or newer: earlier releases are affected by
-  GHSA-3w57-8xmc-8v26, GHSA-5p39-cfhj-2xmp and GHSA-82r6-8w77-94w6 and cannot
-  resolve.
 - An editor with a Language Server Protocol client (Neovim, VS Code, Helix,
   Emacs, Sublime Text LSP and others).
 
@@ -382,4 +379,4 @@ way, without additional terms. Dependencies keep their own licences.
 [bestpractices]: https://www.bestpractices.dev/projects/13375
 [camt053]: https://github.com/sebastienrousseau/camt053
 [pygls]: https://github.com/openlawlibrary/pygls
-[release]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.25
+[release]: https://github.com/sebastienrousseau/camt053-lsp/releases/tag/v0.0.26
