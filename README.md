@@ -95,7 +95,7 @@ camt053-lsp --version
 - Python 3.11 or newer, tested in CI on 3.11, 3.12, 3.13 and 3.14 on
   Linux ([toolchain policy](docs/POLICIES.md)). The package is pure Python
   and runs wherever its dependencies do: macOS, Linux and Windows.
-- `camt053` 0.0.25 or newer (below 1.0) and `pygls` 1.3 or newer, installed
+- `camt053` 0.0.26 or newer (below 1.0) and `pygls` 1.3 or newer, installed
   automatically.
 - An editor with a Language Server Protocol client (Neovim, VS Code, Helix,
   Emacs, Sublime Text LSP and others).
