@@ -9,7 +9,7 @@ urllib3>=2.8.0
 # filelock (through cachecontrol) <= 4.2.0: GHSA-9vhv-jxww-xfm5,
 # GHSA-567q-5qvw-pf92 and GHSA-v4x8-3wr5-3wq8, fixed in 4.2.1, which
 # needs Python 3.11.
-filelock>=4.2.5
+filelock>=4.2.9
 # msgpack (through cachecontrol) <= 1.2.2: GHSA-j586-36cw-2gc2
 # (CVE-2026-114613), fixed in 1.2.3.
 msgpack>=1.2.4
