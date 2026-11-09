@@ -14,9 +14,9 @@ security updates.
 
 | Version  | Supported          | Status |
 | -------- | ------------------ | ------ |
-| 0.0.25   | :white_check_mark: | Latest |
-| 0.0.24   | :white_check_mark: | Prior  |
-| < 0.0.24 | :x:                |        |
+| 0.0.26   | :white_check_mark: | Latest |
+| 0.0.25   | :white_check_mark: | Prior  |
+| < 0.0.25 | :x:                |        |
 
 ## Reporting a Vulnerability
 
